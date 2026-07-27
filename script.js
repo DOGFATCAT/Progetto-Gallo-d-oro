@@ -130,11 +130,34 @@ function detachListeners(){
   activeListeners = [];
 }
 
+// Escapa un valore per l'uso sicuro dentro un attributo HTML tra doppi apici
+function escapeAttr(str){
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 function attachRankListener(year, photoId){
   const r = db.ref(`votes/${year}/${photoId}/voters`);
   const cb = (snapshot) => renderRankFromData(year, photoId, snapshot.val() || {});
   r.on('value', cb);
   activeListeners.push({ref:r, cb});
+
+  // Delega il click sulle righe della classifica una sola volta per lista,
+  // leggendo il nome da un data-attribute invece che da un onclick inline
+  // (più sicuro con apostrofi/virgolette nei nomi, e più affidabile in generale).
+  const listEl = document.getElementById(`rank-${year}-${photoId}`);
+  if(listEl && !listEl.dataset.delegated){
+    listEl.dataset.delegated = 'true';
+    listEl.addEventListener('click', (e) => {
+      const row = e.target.closest('.rank-row');
+      if(!row) return;
+      addVote(year, photoId, row.dataset.name);
+    });
+  }
 }
 
 function addVote(year, photoId, rawName){
@@ -176,10 +199,10 @@ function renderRankFromData(year, photoId, votersObj){
   const badgeClass = (idx)=> idx===0?'oro':idx===1?'argento':idx===2?'bronzo':'altro';
   const badgeLabel = (idx)=> idx===0?'🥇':idx===1?'🥈':idx===2?'🥉':(idx+1);
   el.innerHTML = entries.map(({name,count},idx)=>`
-    <li class="rank-row" onclick="__voteExisting(${year}, '${photoId}', ${JSON.stringify(name)})">
+    <li class="rank-row" data-name="${escapeAttr(name)}">
       <span class="rank-badge ${badgeClass(idx)}">${badgeLabel(idx)}</span>
       <span class="rank-name">${escapeHtml(name)}</span>
-      <span class="rank-count">${count} voto${count===1?'':'i'}</span>
+      <span class="rank-count">${count} ${count===1?'voto':'voti'}</span>
     </li>
   `).join('');
 }
@@ -193,10 +216,6 @@ window.__vote = function(ev, year, photoId){
   addVote(year, photoId, name);
   input.value = '';
   return false;
-};
-
-window.__voteExisting = function(year, photoId, name){
-  addVote(year, photoId, name);
 };
 
 // Genera la scheda HTML di una foto (usata dalla pagina 3)
