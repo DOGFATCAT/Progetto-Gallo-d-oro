@@ -34,16 +34,16 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
 <script src="script.js"></script>
 <script>
-  mountNav('foto');
-
   const params = new URLSearchParams(window.location.search);
   const year = params.get('anno');
+
+  if(year) setLastYear(year); // ricorda l'anno PRIMA di disegnare il menu
+  mountNav('foto');
 
   if(!year){
     document.getElementById('no-year-msg').style.display = 'block';
     document.getElementById('loading-msg').style.display = 'none';
   } else {
-    setLastYear(year); // ricorda l'anno per il link "Foto" nel menu
     document.getElementById('year-title').textContent = `Foto del ${year}`;
     loadYearPhotos(year);
   }

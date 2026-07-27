@@ -98,9 +98,9 @@ function renderTopNav(active){
   const fotoHref = lastYear ? `pagina3-foto.html?anno=${lastYear}` : null;
   return `
     <div class="topnav">
-      <a class="brand" href="pagina1-storia.html"><span class="cresta">🐓</span> Gallo d'Oro <span style="color:var(--cream-dim); font-weight:600; font-size:0.85rem;">di Petriano</span></a>
+      <a class="brand" href="index.html"><span class="cresta">🐓</span> Gallo d'Oro <span style="color:var(--cream-dim); font-weight:600; font-size:0.85rem;">di Petriano</span></a>
       <div class="navlinks">
-        <a href="pagina1-storia.html" class="${active==='storia'?'active':''}">Storia</a>
+        <a href="index.html" class="${active==='storia'?'active':''}">Storia</a>
         <a href="pagina2-anni.html" class="${active==='anni'?'active':''}">Scegli anno</a>
         ${fotoHref
           ? `<a href="${fotoHref}" class="${active==='foto'?'active':''}">Foto ${lastYear ? '('+lastYear+')' : ''}</a>`
