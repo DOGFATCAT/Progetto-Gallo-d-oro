@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gallo d'Oro di Petriano — Scegli l'edizione</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Space+Mono:wght@400;700&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <div id="nav-slot"></div>
+
+  <div class="page-head">
+    <h2>Scegli l'edizione</h2>
+    <p>Ogni biglietto è un'annata del Festival. Selezionane una per rivedere le foto e aiutarci a riconoscere chi c'è nello scatto.</p>
+  </div>
+
+  <div class="search-row">
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input id="year-search" type="text" inputmode="numeric" placeholder="Cerca un anno, es. 1998" oninput="filterYears(this.value)">
+    <button id="search-clear-btn" class="search-clear" style="display:none;" onclick="clearYearSearch()" aria-label="Cancella ricerca">✕</button>
+  </div>
+
+  <div class="demo-banner"><b>Nota:</b> qui sono generate tutte le edizioni dal 1966 al 2026, con un numero di foto segnaposto variabile per anno. Quando avrai l'archivio reale, basta modificare <code>YEAR_START</code>, <code>YEAR_END</code> e la mappa <code>PHOTO_COUNTS</code> in <code>script.js</code> — anche rimuovendo gli anni senza foto.</div>
+
+  <div class="ticket-grid" id="ticket-grid"></div>
+  <p class="rank-empty" id="no-results" style="display:none; padding:20px 0;"></p>
+
+  <footer>Festival Gallo d'Oro · Gallo di Petriano (PU) · dal 1966</footer>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+<script src="script.js"></script>
+<script>
+  mountNav('anni');
+
+  // Genera i biglietti di tutti gli anni definiti in script.js (YEARS)
+  const grid = document.getElementById('ticket-grid');
+  grid.innerHTML = YEARS.map(y => `
+    <a class="ticket" data-year="${y}" href="pagina3-foto.html?anno=${y}">
+      <div class="tk-eyebrow">Ingresso · Piazza Cavour</div>
+      <div class="tk-year">${y}</div>
+      <div class="tk-sub">EDIZIONE · ${y} · GALLO DI PETRIANO</div>
+    </a>
+  `).join('');
+
+  function filterYears(query){
+    const q = query.trim();
+    document.getElementById('search-clear-btn').style.display = q ? 'inline-block' : 'none';
+
+    const tickets = grid.querySelectorAll('.ticket');
+    let visibleCount = 0;
+    tickets.forEach(t => {
+      const match = !q || t.dataset.year.includes(q);
+      t.style.display = match ? '' : 'none';
+      if(match) visibleCount++;
+    });
+
+    const noResults = document.getElementById('no-results');
+    if(visibleCount === 0 && q){
+      noResults.textContent = `Nessuna edizione trovata per "${q}".`;
+      noResults.style.display = 'block';
+    } else {
+      noResults.style.display = 'none';
+    }
+  }
+
+  function clearYearSearch(){
+    const input = document.getElementById('year-search');
+    input.value = '';
+    filterYears('');
+    input.focus();
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gallo d'Oro di Petriano — Foto dell'edizione</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Space+Mono:wght@400;700&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <div id="nav-slot"></div>
+
+  <a class="back-link" href="pagina2-anni.html">← Torna agli anni</a>
+
+  <div class="page-head" style="padding-top:0;">
+    <h2 id="year-title">Foto</h2>
+    <p>Scrivi un nome sotto ogni foto, oppure tocca un nome già proposto in classifica per aggiungere il tuo voto. La classifica è condivisa: la vede tutta la comunità.</p>
+  </div>
+
+  <div id="no-year-msg" style="display:none; color:var(--cream-dim);">
+    Nessun anno selezionato. <a href="pagina2-anni.html" style="color:var(--gold-bright);">Torna alla pagina degli anni</a> per sceglierne uno.
+  </div>
+
+  <div id="loading-msg" style="color:var(--cream-dim);">Caricamento foto…</div>
+  <div id="demo-banner-slot"></div>
+  <div class="photo-grid" id="photo-grid"></div>
+
+  <footer>Festival Gallo d'Oro · Gallo di Petriano (PU) · dal 1966</footer>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+<script src="script.js"></script>
+<script>
+  mountNav('foto');
+
+  const params = new URLSearchParams(window.location.search);
+  const year = params.get('anno');
+
+  if(!year){
+    document.getElementById('no-year-msg').style.display = 'block';
+    document.getElementById('loading-msg').style.display = 'none';
+  } else {
+    setLastYear(year); // ricorda l'anno per il link "Foto" nel menu
+    document.getElementById('year-title').textContent = `Foto del ${year}`;
+    loadYearPhotos(year);
+  }
+
+  async function loadYearPhotos(year){
+    const grid = document.getElementById('photo-grid');
+    const loadingMsg = document.getElementById('loading-msg');
+    const bannerSlot = document.getElementById('demo-banner-slot');
+
+    let realPhotos = null;
+    try{
+      const snap = await db.ref(`photos/${year}`).once('value');
+      realPhotos = snap.val();
+    }catch(e){
+      console.error('Errore caricamento foto', e);
+    }
+
+    loadingMsg.style.display = 'none';
+
+    const hasReal = realPhotos && Object.keys(realPhotos).length > 0;
+    let cardsHtml = '';
+    let ids = [];
+
+    if(hasReal){
+      Object.entries(realPhotos).forEach(([photoId, dataUrl], idx) => {
+        cardsHtml += photoCardHtml(year, photoId, idx+1, `<img src="${dataUrl}" alt="Foto ${idx+1} del ${year}">`, '');
+        ids.push(photoId);
+      });
+    } else {
+      bannerSlot.innerHTML = `<div class="demo-banner">Per questo anno non sono ancora state caricate foto reali: qui sotto vedi dei segnaposto demo. Caricale dalla pagina admin.</div>`;
+      const count = photoCountFor(year);
+      for(let i=1;i<=count;i++){
+        const photoId = `p${i}`;
+        cardsHtml += photoCardHtml(year, photoId, i, `<div class="photo-placeholder">${cameraIcon()}</div>`, 'foto segnaposto — carica lo scatto reale');
+        ids.push(photoId);
+      }
+    }
+
+    grid.innerHTML = cardsHtml;
+    ids.forEach(id => attachRankListener(year, id));
+  }
+</script>
+</body>
+</html>

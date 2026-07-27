@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gallo d'Oro — Area riservata</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Space+Mono:wght@400;700&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --night:#131b2e; --night-deep:#0b1120;
+    --gold:#d9a441; --gold-bright:#f0c869;
+    --crimson:#b23a2f; --crimson-bright:#d1503f;
+    --cream:#f6ecd9; --cream-dim:#ece0c8;
+    --ink:#1c1710; --ink-soft:#4a4335;
+    --line: rgba(217,164,65,0.25);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh;
+    background:
+      radial-gradient(ellipse at 20% -10%, rgba(217,164,65,0.10), transparent 45%),
+      radial-gradient(ellipse at 90% 0%, rgba(178,58,47,0.10), transparent 40%),
+      var(--night);
+    color:var(--cream);
+    font-family:'Nunito Sans', sans-serif;
+  }
+  .wrap{max-width:900px; margin:0 auto; padding:40px 20px 60px;}
+  h1{
+    font-family:'Playfair Display', serif; font-weight:900;
+    font-size:1.8rem; margin:0 0 6px; color:var(--gold-bright);
+  }
+  .sub{color:var(--cream-dim); margin:0 0 30px; font-size:0.95rem;}
+
+  /* login */
+  .login-card{
+    background:var(--cream); color:var(--ink);
+    border-radius:10px; padding:34px; max-width:380px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.35);
+  }
+  .login-card label{
+    display:block; font-size:0.78rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:0.05em;
+    color:var(--ink-soft); margin:14px 0 6px;
+  }
+  .login-card input{
+    width:100%; padding:11px 12px; border-radius:6px;
+    border:1px solid rgba(28,23,16,0.2); font-size:0.95rem;
+  }
+  .login-card input:focus{outline:none; border-color:var(--crimson);}
+  .btn{
+    font-family:'Nunito Sans',sans-serif; font-weight:800; font-size:0.9rem;
+    padding:12px 22px; border-radius:999px; border:none; cursor:pointer;
+    transition:transform .15s ease;
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn-primary{background:var(--crimson); color:var(--cream);}
+  .btn-gold{background:var(--gold); color:var(--night-deep);}
+  .btn-ghost{background:transparent; color:var(--gold-bright); border:1px solid var(--gold);}
+  .login-card .btn{width:100%; margin-top:20px;}
+  .error{color:var(--crimson); font-size:0.85rem; margin-top:12px; min-height:1.2em;}
+
+  /* topbar dopo login */
+  .topbar{
+    display:flex; justify-content:space-between; align-items:center;
+    border-bottom:1px solid var(--line); padding-bottom:16px; margin-bottom:26px;
+    flex-wrap:wrap; gap:10px;
+  }
+  .who{font-size:0.85rem; color:var(--cream-dim);}
+
+  .panel{
+    background:rgba(246,236,217,0.04);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:24px;
+    margin-bottom:26px;
+  }
+  .panel h2{font-family:'Playfair Display', serif; font-size:1.3rem; margin:0 0 14px; color:var(--cream);}
+  select{
+    background:var(--cream); color:var(--ink);
+    border:none; border-radius:6px; padding:10px 14px;
+    font-size:0.95rem; font-weight:700; min-width:160px;
+  }
+  .drop{
+    border:2px dashed var(--gold);
+    border-radius:10px;
+    padding:30px;
+    text-align:center;
+    color:var(--cream-dim);
+    margin-top:18px;
+    cursor:pointer;
+    transition:background .15s ease;
+  }
+  .drop.dragover{background:rgba(217,164,65,0.08);}
+  .drop input{display:none;}
+
+  .grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(160px,1fr));
+    gap:16px; margin-top:20px;
+  }
+  .thumb{
+    background:var(--cream); border-radius:6px; padding:8px 8px 0;
+    position:relative;
+  }
+  .thumb img{width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:2px; display:block;}
+  .thumb .cap{
+    font-family:'Space Mono', monospace; font-size:0.68rem; color:var(--ink-soft);
+    padding:6px 2px 8px; display:flex; justify-content:space-between; align-items:center;
+  }
+  .thumb .del{
+    background:var(--crimson); color:var(--cream); border:none;
+    border-radius:4px; font-size:0.7rem; font-weight:700;
+    padding:4px 8px; cursor:pointer;
+  }
+  .thumb .del:hover{background:var(--crimson-bright);}
+  .uploading{
+    display:flex; align-items:center; justify-content:center;
+    aspect-ratio:4/3; background:rgba(217,164,65,0.08);
+    border-radius:6px; font-size:0.75rem; color:var(--gold-bright);
+  }
+  .status{margin-top:14px; font-size:0.85rem; color:var(--gold-bright); min-height:1.2em;}
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🐓 Gallo d'Oro — Area riservata</h1>
+  <p class="sub">Carica qui le foto reali delle edizioni del Festival. Solo tu puoi accedere a questa pagina.</p>
+
+  <!-- LOGIN -->
+  <div id="login-view" class="login-card">
+    <label for="email">Email</label>
+    <input type="email" id="email" autocomplete="username">
+    <label for="password">Password</label>
+    <input type="password" id="password" autocomplete="current-password">
+    <button class="btn btn-primary" onclick="doLogin()">Accedi</button>
+    <div class="error" id="login-error"></div>
+  </div>
+
+  <!-- AREA ADMIN -->
+  <div id="admin-view" class="hidden">
+    <div class="topbar">
+      <span class="who">Connesso come <b id="who-email"></b></span>
+      <button class="btn btn-ghost" onclick="doLogout()">Esci</button>
+    </div>
+
+    <div class="panel">
+      <h2>Seleziona edizione</h2>
+      <select id="year-select" onchange="onYearChange()"></select>
+    </div>
+
+    <div class="panel">
+      <h2>Carica nuove foto</h2>
+      <p style="color:var(--cream-dim); font-size:0.88rem; margin:0;">Puoi selezionare più foto insieme. Vengono compresse automaticamente prima del salvataggio.</p>
+      <div class="drop" id="drop-zone" onclick="document.getElementById('file-input').click()">
+        📷 Clicca qui o trascina le foto da caricare
+        <input type="file" id="file-input" accept="image/*" multiple onchange="handleFiles(this.files)">
+      </div>
+      <div class="status" id="upload-status"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Foto già caricate per questo anno</h2>
+      <div class="grid" id="existing-grid"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+<script>
+(function(){
+  const firebaseConfig = {
+    apiKey: "AIzaSyAnNbVMn0MEy1N2MT5aWfSgFpHdpCEc1qU",
+    authDomain: "gallo-oro-petriano.firebaseapp.com",
+    databaseURL: "https://gallo-oro-petriano-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "gallo-oro-petriano",
+    storageBucket: "gallo-oro-petriano.firebasestorage.app",
+    messagingSenderId: "389838416330",
+    appId: "1:389838416330:web:c778ed3bbd04262c5c8733",
+    measurementId: "G-YFHY6N3BYS"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.database();
+
+  const YEAR_START = 1966;
+  const YEAR_END = 2026;
+
+  window.doLogin = function(){
+    const email = document.getElementById('email').value.trim();
+    const pass = document.getElementById('password').value;
+    document.getElementById('login-error').textContent = '';
+    auth.signInWithEmailAndPassword(email, pass).catch(err => {
+      document.getElementById('login-error').textContent = 'Accesso non riuscito: controlla email e password.';
+    });
+  };
+
+  window.doLogout = function(){ auth.signOut(); };
+
+  auth.onAuthStateChanged(user => {
+    if(user){
+      document.getElementById('login-view').classList.add('hidden');
+      document.getElementById('admin-view').classList.remove('hidden');
+      document.getElementById('who-email').textContent = user.email;
+      initYearSelect();
+    } else {
+      document.getElementById('login-view').classList.remove('hidden');
+      document.getElementById('admin-view').classList.add('hidden');
+    }
+  });
+
+  function initYearSelect(){
+    const sel = document.getElementById('year-select');
+    if(sel.options.length > 0) { loadExisting(); return; }
+    let opts = '';
+    for(let y = YEAR_END; y >= YEAR_START; y--){
+      opts += `<option value="${y}">${y}</option>`;
+    }
+    sel.innerHTML = opts;
+    loadExisting();
+  }
+
+  window.onYearChange = function(){ loadExisting(); };
+
+  function currentYear(){
+    return document.getElementById('year-select').value;
+  }
+
+  async function loadExisting(){
+    const year = currentYear();
+    const grid = document.getElementById('existing-grid');
+    grid.innerHTML = '<p style="color:var(--cream-dim); font-size:0.85rem;">Caricamento…</p>';
+    try{
+      const snap = await db.ref(`photos/${year}`).once('value');
+      const data = snap.val() || {};
+      const entries = Object.entries(data);
+      if(entries.length === 0){
+        grid.innerHTML = '<p style="color:var(--cream-dim); font-size:0.85rem;">Nessuna foto caricata per questo anno.</p>';
+        return;
+      }
+      grid.innerHTML = entries.map(([id, dataUrl]) => `
+        <div class="thumb" id="thumb-${id}">
+          <img src="${dataUrl}" alt="Foto ${year}">
+          <div class="cap">
+            <span>${id.slice(0,8)}</span>
+            <button class="del" onclick="deletePhoto('${year}','${id}')">Elimina</button>
+          </div>
+        </div>
+      `).join('');
+    }catch(e){
+      grid.innerHTML = '<p class="error">Errore nel caricamento delle foto.</p>';
+    }
+  }
+
+  window.deletePhoto = async function(year, id){
+    if(!confirm('Eliminare questa foto? L\'azione è definitiva.')) return;
+    await db.ref(`photos/${year}/${id}`).remove();
+    // rimuovo anche i voti associati a quella foto, così non restano orfani
+    await db.ref(`votes/${year}/${id}`).remove();
+    loadExisting();
+  };
+
+  // ---------------- UPLOAD + COMPRESSIONE ----------------
+  const dropZone = document.getElementById('drop-zone');
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    handleFiles(e.dataTransfer.files);
+  });
+
+  window.handleFiles = async function(fileList){
+    const files = Array.from(fileList || []).filter(f => f.type.startsWith('image/'));
+    if(files.length === 0) return;
+    const year = currentYear();
+    const statusEl = document.getElementById('upload-status');
+
+    for(let i=0;i<files.length;i++){
+      statusEl.textContent = `Carico ${i+1} di ${files.length}…`;
+      try{
+        const dataUrl = await compressImage(files[i], 1000, 0.72);
+        const newRef = db.ref(`photos/${year}`).push();
+        await newRef.set(dataUrl);
+      }catch(e){
+        console.error(e);
+        statusEl.textContent = `Errore caricando "${files[i].name}", proseguo con le altre.`;
+      }
+    }
+    statusEl.textContent = `Fatto: ${files.length} foto caricate.`;
+    document.getElementById('file-input').value = '';
+    loadExisting();
+  };
+
+  function compressImage(file, maxWidth, quality){
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('Lettura file fallita'));
+      reader.onload = () => {
+        const img = new Image();
+        img.onerror = () => reject(new Error('Immagine non valida'));
+        img.onload = () => {
+          let w = img.width, h = img.height;
+          if(w > maxWidth){
+            h = Math.round(h * (maxWidth / w));
+            w = maxWidth;
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+})();
+</script>
+</body>
+</html>
