@@ -201,11 +201,17 @@ window.__voteExisting = function(year, photoId, name){
 
 // Genera la scheda HTML di una foto (usata dalla pagina 3)
 function photoCardHtml(year, photoId, label, mediaHtml, caption){
+  // Se la scheda contiene una foto vera (non un segnaposto), la rendo
+  // cliccabile per aprirla ingrandita nel lightbox.
+  const media = mediaHtml.includes('<img')
+    ? `<div class="polaroid-img-wrap" onclick="openLightbox(this)">${mediaHtml}</div>`
+    : mediaHtml;
+
   return `
     <div class="photo-card">
       <div class="photo-id">Scatto ${label} · ${year}</div>
       <div class="polaroid">
-        ${mediaHtml}
+        ${media}
         ${caption ? `<div class="polaroid-cap">${caption}</div>` : ''}
       </div>
       <form class="vote-form" onsubmit="return __vote(event, ${year}, '${photoId}')">
@@ -218,4 +224,28 @@ function photoCardHtml(year, photoId, label, mediaHtml, caption){
       </ul>
     </div>
   `;
+}
+
+// ---------------- LIGHTBOX (ingrandimento foto) ----------------
+// Richiede nella pagina un overlay con id="lightbox-overlay" e
+// un'immagine con id="lightbox-img" (presenti in pagina3-foto.html).
+function openLightbox(wrapperEl){
+  const img = wrapperEl.querySelector('img');
+  const overlay = document.getElementById('lightbox-overlay');
+  const lbImg = document.getElementById('lightbox-img');
+  if(!img || !overlay || !lbImg) return;
+  lbImg.src = img.src;
+  lbImg.alt = img.alt || '';
+  overlay.classList.add('open');
+  document.addEventListener('keydown', __closeLightboxOnEsc);
+}
+
+function closeLightbox(){
+  const overlay = document.getElementById('lightbox-overlay');
+  if(overlay) overlay.classList.remove('open');
+  document.removeEventListener('keydown', __closeLightboxOnEsc);
+}
+
+function __closeLightboxOnEsc(e){
+  if(e.key === 'Escape') closeLightbox();
 }

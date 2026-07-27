@@ -30,6 +30,11 @@
   <footer>Festival Gallo d'Oro · Gallo di Petriano (PU) · dal 1966</footer>
 </div>
 
+<div class="lightbox-overlay" id="lightbox-overlay" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()" aria-label="Chiudi">✕</button>
+  <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()">
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
 <script src="script.js"></script>
@@ -69,7 +74,7 @@
 
     if(hasReal){
       Object.entries(realPhotos).forEach(([photoId, dataUrl], idx) => {
-        cardsHtml += photoCardHtml(year, photoId, idx+1, `<img src="${dataUrl}" alt="Foto ${idx+1} del ${year}">`, '');
+        cardsHtml += photoCardHtml(year, photoId, idx+1, `<img src="${dataUrl}" alt="Foto ${idx+1} del ${year}">`, 'clicca per ingrandire');
         ids.push(photoId);
       });
     } else {
