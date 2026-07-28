@@ -66,6 +66,23 @@ YEARS.forEach((y, idx) => {
 });
 function photoCountFor(year){ return PHOTO_COUNTS[year] || 2; }
 
+// ---------------- ANNI ATTIVI (impostati a mano dalla pagina admin) ----------------
+// Ritorna un array di anni (numeri) da mostrare nella pagina 2, oppure null
+// se l'admin non ha ancora impostato nulla — in quel caso il chiamante può
+// decidere di mostrare tutti gli YEARS come demo di fallback.
+async function getVisibleYears(){
+  try{
+    const snap = await db.ref('meta/activeYears').once('value');
+    const val = snap.val();
+    if(val && Object.keys(val).length > 0){
+      return YEARS.filter(y => !!val[y]);
+    }
+  }catch(e){
+    console.error('Errore lettura anni attivi', e);
+  }
+  return null;
+}
+
 // ---------------- HELPER GENERICI ----------------
 function escapeHtml(str){
   const d = document.createElement('div');
@@ -160,9 +177,46 @@ function attachRankListener(year, photoId){
   }
 }
 
+// ---------------- ANTI-SPAM: tempo minimo tra un voto e l'altro ----------------
+const VOTE_COOLDOWN_MS = 4000; // 4 secondi
+
+function getLastVoteTime(){
+  try{ return parseInt(localStorage.getItem('gallo-oro-last-vote-time') || '0', 10); }
+  catch(e){ return window.__memLastVoteTime || 0; }
+}
+function setLastVoteTime(t){
+  try{ localStorage.setItem('gallo-oro-last-vote-time', String(t)); }
+  catch(e){ window.__memLastVoteTime = t; }
+}
+
+// Piccolo avviso temporaneo in basso, usato per i messaggi anti-spam
+function showToast(msg){
+  let toast = document.getElementById('gallo-toast');
+  if(!toast){
+    toast = document.createElement('div');
+    toast.id = 'gallo-toast';
+    toast.className = 'gallo-toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
 function addVote(year, photoId, rawName){
   const name = rawName.trim();
   if(!name) return;
+
+  const now = Date.now();
+  const waited = now - getLastVoteTime();
+  if(waited < VOTE_COOLDOWN_MS){
+    const secondsLeft = Math.ceil((VOTE_COOLDOWN_MS - waited) / 1000);
+    showToast(`Aspetta ${secondsLeft} secondi prima di votare di nuovo`);
+    return;
+  }
+  setLastVoteTime(now);
+
   db.ref(`votes/${year}/${photoId}/voters/${CLIENT_ID}`)
     .set(name)
     .catch(err => console.error('Errore voto', err));

@@ -23,7 +23,7 @@
     <button id="search-clear-btn" class="search-clear" style="display:none;" onclick="clearYearSearch()" aria-label="Cancella ricerca">✕</button>
   </div>
 
-  <div class="demo-banner"><b>Nota:</b> qui sono generate tutte le edizioni dal 1966 al 2026, con un numero di foto segnaposto variabile per anno. Quando avrai l'archivio reale, basta modificare <code>YEAR_START</code>, <code>YEAR_END</code> e la mappa <code>PHOTO_COUNTS</code> in <code>script.js</code> — anche rimuovendo gli anni senza foto.</div>
+  <div id="demo-banner-slot"></div>
 
   <div class="ticket-grid" id="ticket-grid"></div>
   <p class="rank-empty" id="no-results" style="display:none; padding:20px 0;"></p>
@@ -37,15 +37,25 @@
 <script>
   mountNav('anni');
 
-  // Genera i biglietti di tutti gli anni definiti in script.js (YEARS)
   const grid = document.getElementById('ticket-grid');
-  grid.innerHTML = YEARS.map(y => `
-    <a class="ticket" data-year="${y}" href="pagina3-foto.html?anno=${y}">
-      <div class="tk-eyebrow">Ingresso · Piazza Cavour</div>
-      <div class="tk-year">${y}</div>
-      <div class="tk-sub">EDIZIONE · ${y} · GALLO DI PETRIANO</div>
-    </a>
-  `).join('');
+  const bannerSlot = document.getElementById('demo-banner-slot');
+
+  (async function initYears(){
+    const visibleYears = await getVisibleYears(); // null se l'admin non ha ancora impostato nulla
+    const yearsToShow = visibleYears || YEARS;
+
+    if(!visibleYears){
+      bannerSlot.innerHTML = `<div class="demo-banner"><b>Nota:</b> non hai ancora impostato quali edizioni esistono davvero, quindi qui sotto vedi tutti gli anni dal 1966 al 2026 come demo. Vai nella pagina admin per selezionare solo gli anni in cui il Festival si è davvero svolto.</div>`;
+    }
+
+    grid.innerHTML = yearsToShow.map(y => `
+      <a class="ticket" data-year="${y}" href="pagina3-foto.html?anno=${y}">
+        <div class="tk-eyebrow">Ingresso · Piazza Cavour</div>
+        <div class="tk-year">${y}</div>
+        <div class="tk-sub">EDIZIONE · ${y} · GALLO DI PETRIANO</div>
+      </a>
+    `).join('');
+  })();
 
   function filterYears(query){
     const q = query.trim();

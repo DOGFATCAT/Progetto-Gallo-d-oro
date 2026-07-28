@@ -81,6 +81,33 @@
     border:none; border-radius:6px; padding:10px 14px;
     font-size:0.95rem; font-weight:700; min-width:160px;
   }
+  .year-toggle-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(90px,1fr));
+    gap:8px;
+    max-height:280px;
+    overflow-y:auto;
+    padding-right:6px;
+  }
+  .year-toggle{
+    display:flex; align-items:center; gap:8px;
+    background:rgba(246,236,217,0.04);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:8px 10px;
+    font-family:'Space Mono', monospace;
+    font-size:0.82rem;
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .year-toggle:hover{border-color:var(--gold);}
+  .year-toggle.active{
+    background:rgba(217,164,65,0.14);
+    border-color:var(--gold);
+    color:var(--gold-bright);
+    font-weight:700;
+  }
+  .year-toggle input{margin:0;}
   .drop{
     border:2px dashed var(--gold);
     border-radius:10px;
@@ -145,7 +172,13 @@
     </div>
 
     <div class="panel">
-      <h2>Seleziona edizione</h2>
+      <h2>Anni presenti (edizioni realmente svolte)</h2>
+      <p style="color:var(--cream-dim); font-size:0.88rem; margin:0 0 12px;">Seleziona solo gli anni in cui il Festival si è davvero svolto (alcuni anni potrebbe essere saltato). Il sito pubblico mostrerà solo questi.</p>
+      <div class="year-toggle-grid" id="year-toggle-grid"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Seleziona edizione da modificare</h2>
       <select id="year-select" onchange="onYearChange()"></select>
     </div>
 
@@ -205,11 +238,55 @@
       document.getElementById('admin-view').classList.remove('hidden');
       document.getElementById('who-email').textContent = user.email;
       initYearSelect();
+      initActiveYearsGrid();
     } else {
       document.getElementById('login-view').classList.remove('hidden');
       document.getElementById('admin-view').classList.add('hidden');
     }
   });
+
+  // ---------------- ANNI ATTIVI (edizioni realmente svolte) ----------------
+  async function initActiveYearsGrid(){
+    const grid = document.getElementById('year-toggle-grid');
+    if(grid.dataset.initialized) return; // evita di ricostruire ad ogni login
+    grid.dataset.initialized = 'true';
+
+    let activeYears = {};
+    try{
+      const snap = await db.ref('meta/activeYears').once('value');
+      activeYears = snap.val() || {};
+    }catch(e){
+      console.error('Errore lettura anni attivi', e);
+    }
+
+    let html = '';
+    for(let y = YEAR_END; y >= YEAR_START; y--){
+      const isActive = !!activeYears[y];
+      html += `
+        <label class="year-toggle ${isActive ? 'active' : ''}" id="yt-${y}">
+          <input type="checkbox" ${isActive ? 'checked' : ''} onchange="toggleActiveYear(${y}, this.checked)">
+          ${y}
+        </label>
+      `;
+    }
+    grid.innerHTML = html;
+  }
+
+  window.toggleActiveYear = async function(year, isActive){
+    const label = document.getElementById(`yt-${year}`);
+    try{
+      if(isActive){
+        await db.ref(`meta/activeYears/${year}`).set(true);
+        if(label) label.classList.add('active');
+      } else {
+        await db.ref(`meta/activeYears/${year}`).remove();
+        if(label) label.classList.remove('active');
+      }
+    }catch(e){
+      console.error('Errore salvataggio anno attivo', e);
+      alert('Errore nel salvataggio, riprova.');
+    }
+  };
 
   function initYearSelect(){
     const sel = document.getElementById('year-select');
