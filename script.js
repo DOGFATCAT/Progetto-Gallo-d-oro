@@ -273,20 +273,49 @@ window.__vote = function(ev, year, photoId){
 };
 
 // Genera la scheda HTML di una foto (usata dalla pagina 3)
-function photoCardHtml(year, photoId, label, mediaHtml, caption){
+// Legge il valore salvato per una foto, che può essere:
+// - una stringa (formato vecchio: solo l'immagine, voto sempre attivo)
+// - un oggetto { data, voting, caption } (formato nuovo)
+function normalizePhotoValue(val){
+  if(typeof val === 'string') return { data: val, voting: true, caption: '' };
+  if(val && typeof val === 'object') return { data: val.data, voting: val.voting !== false, caption: val.caption || '' };
+  return { data: null, voting: true, caption: '' };
+}
+
+function photoCardHtml(year, photoId, label, mediaHtml, hintCaption, votingEnabled, manualCaption){
+  if(votingEnabled === undefined) votingEnabled = true; // retrocompatibilità
+  manualCaption = (manualCaption || '').trim();
+
   // Se la scheda contiene una foto vera (non un segnaposto), la rendo
   // cliccabile per aprirla ingrandita nel lightbox.
   const media = mediaHtml.includes('<img')
     ? `<div class="polaroid-img-wrap" onclick="openLightbox(this)">${mediaHtml}</div>`
     : mediaHtml;
 
+  if(!votingEnabled){
+    const captionBlock = manualCaption
+      ? `<p class="manual-caption"><b>Chi si vede:</b> ${escapeHtml(manualCaption)}</p>`
+      : `<p class="mine-note">📷 Foto di gruppo — il gioco "chi è" non è attivo qui.</p>`;
+    return `
+      <div class="photo-card">
+        <div class="photo-id">Scatto ${label} · ${year}</div>
+        <div class="polaroid">
+          ${media}
+          ${hintCaption ? `<div class="polaroid-cap">${hintCaption}</div>` : ''}
+        </div>
+        ${captionBlock}
+      </div>
+    `;
+  }
+
   return `
     <div class="photo-card">
       <div class="photo-id">Scatto ${label} · ${year}</div>
       <div class="polaroid">
         ${media}
-        ${caption ? `<div class="polaroid-cap">${caption}</div>` : ''}
+        ${hintCaption ? `<div class="polaroid-cap">${hintCaption}</div>` : ''}
       </div>
+      ${manualCaption ? `<p class="manual-caption"><b>Nota:</b> ${escapeHtml(manualCaption)}</p>` : ''}
       <form class="vote-form" onsubmit="return __vote(event, ${year}, '${photoId}')">
         <input type="text" placeholder="Chi credi che sia?" maxlength="40" required>
         <button type="submit">Vota</button>

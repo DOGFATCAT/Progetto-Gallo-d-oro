@@ -140,6 +140,28 @@
     padding:4px 8px; cursor:pointer;
   }
   .thumb .del:hover{background:var(--crimson-bright);}
+  .vote-toggle{
+    width:100%;
+    margin-top:6px;
+    border:1px solid rgba(28,23,16,0.15);
+    border-radius:4px;
+    padding:6px 8px;
+    font-family:'Space Mono', monospace;
+    font-size:0.68rem;
+    font-weight:700;
+    cursor:pointer;
+    transition:background .15s ease, border-color .15s ease;
+  }
+  .vote-toggle.on{
+    background:rgba(217,164,65,0.15);
+    color:var(--ink);
+    border-color:var(--gold);
+  }
+  .vote-toggle.off{
+    background:rgba(28,23,16,0.06);
+    color:var(--ink-soft);
+  }
+  .vote-toggle:hover{opacity:0.85;}
   .uploading{
     display:flex; align-items:center; justify-content:center;
     aspect-ratio:4/3; background:rgba(217,164,65,0.08);
@@ -237,8 +259,7 @@
       document.getElementById('login-view').classList.add('hidden');
       document.getElementById('admin-view').classList.remove('hidden');
       document.getElementById('who-email').textContent = user.email;
-      initYearSelect();
-      initActiveYearsGrid();
+      initActiveYearsAndSelect();
     } else {
       document.getElementById('login-view').classList.remove('hidden');
       document.getElementById('admin-view').classList.add('hidden');
@@ -246,7 +267,8 @@
   });
 
   // ---------------- ANNI ATTIVI (edizioni realmente svolte) ----------------
-  async function initActiveYearsGrid(){
+  // Popola sia la griglia di checkbox sia il menu a tendina, così restano sincronizzati.
+  async function initActiveYearsAndSelect(){
     const grid = document.getElementById('year-toggle-grid');
     if(grid.dataset.initialized) return; // evita di ricostruire ad ogni login
     grid.dataset.initialized = 'true';
@@ -270,6 +292,33 @@
       `;
     }
     grid.innerHTML = html;
+
+    refreshYearSelect(activeYears);
+    loadExisting();
+  }
+
+  // Ridisegna il menu a tendina in base agli anni attivi correnti
+  function refreshYearSelect(activeYears){
+    const sel = document.getElementById('year-select');
+    const previouslySelected = sel.value;
+    const activeList = Object.keys(activeYears)
+      .filter(y => activeYears[y])
+      .map(y => parseInt(y, 10))
+      .sort((a,b) => b - a);
+
+    if(activeList.length === 0){
+      sel.innerHTML = `<option value="">— nessun anno attivo —</option>`;
+      sel.disabled = true;
+      return;
+    }
+
+    sel.disabled = false;
+    sel.innerHTML = activeList.map(y => `<option value="${y}">${y}</option>`).join('');
+
+    // Se l'anno che stavi guardando è ancora attivo, resta lì; altrimenti prendo il primo disponibile
+    if(activeList.includes(parseInt(previouslySelected, 10))){
+      sel.value = previouslySelected;
+    }
   }
 
   window.toggleActiveYear = async function(year, isActive){
@@ -282,22 +331,15 @@
         await db.ref(`meta/activeYears/${year}`).remove();
         if(label) label.classList.remove('active');
       }
+      // Rileggo tutti gli anni attivi per aggiornare subito il menu a tendina
+      const snap = await db.ref('meta/activeYears').once('value');
+      refreshYearSelect(snap.val() || {});
+      loadExisting();
     }catch(e){
       console.error('Errore salvataggio anno attivo', e);
       alert('Errore nel salvataggio, riprova.');
     }
   };
-
-  function initYearSelect(){
-    const sel = document.getElementById('year-select');
-    if(sel.options.length > 0) { loadExisting(); return; }
-    let opts = '';
-    for(let y = YEAR_END; y >= YEAR_START; y--){
-      opts += `<option value="${y}">${y}</option>`;
-    }
-    sel.innerHTML = opts;
-    loadExisting();
-  }
 
   window.onYearChange = function(){ loadExisting(); };
 
@@ -305,9 +347,21 @@
     return document.getElementById('year-select').value;
   }
 
+  // Legge il valore salvato per una foto: stringa (formato vecchio, voto
+  // sempre attivo) oppure oggetto { data, voting } (formato nuovo).
+  function normalizePhotoValue(val){
+    if(typeof val === 'string') return { data: val, voting: true };
+    if(val && typeof val === 'object') return { data: val.data, voting: val.voting !== false };
+    return { data: null, voting: true };
+  }
+
   async function loadExisting(){
     const year = currentYear();
     const grid = document.getElementById('existing-grid');
+    if(!year){
+      grid.innerHTML = '<p style="color:var(--cream-dim); font-size:0.85rem;">Seleziona prima almeno un anno attivo qui sopra.</p>';
+      return;
+    }
     grid.innerHTML = '<p style="color:var(--cream-dim); font-size:0.85rem;">Caricamento…</p>';
     try{
       const snap = await db.ref(`photos/${year}`).once('value');
@@ -317,19 +371,37 @@
         grid.innerHTML = '<p style="color:var(--cream-dim); font-size:0.85rem;">Nessuna foto caricata per questo anno.</p>';
         return;
       }
-      grid.innerHTML = entries.map(([id, dataUrl]) => `
+      grid.innerHTML = entries.map(([id, rawVal]) => {
+        const { data: imgSrc, voting } = normalizePhotoValue(rawVal);
+        return `
         <div class="thumb" id="thumb-${id}">
-          <img src="${dataUrl}" alt="Foto ${year}">
+          <img src="${imgSrc}" alt="Foto ${year}">
           <div class="cap">
             <span>${id.slice(0,8)}</span>
             <button class="del" onclick="deletePhoto('${year}','${id}')">Elimina</button>
           </div>
+          <button class="vote-toggle ${voting ? 'on' : 'off'}" onclick="toggleVoting('${year}','${id}', ${voting})">
+            ${voting ? '🗳️ Voto attivo' : '🚫 Voto disattivo (foto di gruppo)'}
+          </button>
         </div>
-      `).join('');
+      `;
+      }).join('');
     }catch(e){
       grid.innerHTML = '<p class="error">Errore nel caricamento delle foto.</p>';
     }
   }
+
+  window.toggleVoting = async function(year, id, currentlyVoting){
+    try{
+      const snap = await db.ref(`photos/${year}/${id}`).once('value');
+      const { data } = normalizePhotoValue(snap.val());
+      await db.ref(`photos/${year}/${id}`).set({ data, voting: !currentlyVoting });
+      loadExisting();
+    }catch(e){
+      console.error('Errore aggiornamento voto foto', e);
+      alert('Errore nel salvataggio, riprova.');
+    }
+  };
 
   window.deletePhoto = async function(year, id){
     if(!confirm('Eliminare questa foto? L\'azione è definitiva.')) return;
@@ -354,13 +426,17 @@
     if(files.length === 0) return;
     const year = currentYear();
     const statusEl = document.getElementById('upload-status');
+    if(!year){
+      statusEl.textContent = 'Seleziona prima un anno attivo qui sopra.';
+      return;
+    }
 
     for(let i=0;i<files.length;i++){
       statusEl.textContent = `Carico ${i+1} di ${files.length}…`;
       try{
         const dataUrl = await compressImage(files[i], 1000, 0.72);
         const newRef = db.ref(`photos/${year}`).push();
-        await newRef.set(dataUrl);
+        await newRef.set({ data: dataUrl, voting: true });
       }catch(e){
         console.error(e);
         statusEl.textContent = `Errore caricando "${files[i].name}", proseguo con le altre.`;

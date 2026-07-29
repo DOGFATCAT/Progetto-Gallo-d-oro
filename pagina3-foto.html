@@ -45,6 +45,11 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
 <script src="script.js"></script>
 <script>
+  const BATCH_SIZE = 12; // quante foto caricare per volta
+  let batchCursorKey = null; // ultima chiave caricata, per continuare da lì
+  let batchYear = null;
+  let batchIndex = 0; // per numerare le foto man mano che arrivano
+
   const params = new URLSearchParams(window.location.search);
   const year = params.get('anno');
 
@@ -60,24 +65,27 @@
     loadYearPhotos(year);
   }
 
-  function renderYearNav(y){
-    const prevYear = y - 1;
-    const nextYear = y + 1;
-    const prevHtml = prevYear >= YEAR_START
+  async function renderYearNav(y){
+    // Uso solo gli anni davvero "attivi" impostati in admin; se non ne è
+    // stato impostato nessuno, ricado sull'intero intervallo demo.
+    const visible = await getVisibleYears();
+    const list = (visible && visible.length > 0 ? visible : YEARS).slice().sort((a,b)=>a-b);
+
+    const idx = list.indexOf(y);
+    const prevYear = idx > 0 ? list[idx-1] : null;
+    const nextYear = (idx !== -1 && idx < list.length-1) ? list[idx+1] : null;
+
+    const prevHtml = prevYear !== null
       ? `<a class="year-nav-btn" href="pagina3-foto.html?anno=${prevYear}" title="Edizione ${prevYear}">← ${prevYear}</a>`
-      : `<span class="year-nav-btn disabled">← ${prevYear}</span>`;
-    const nextHtml = nextYear <= YEAR_END
+      : `<span class="year-nav-btn disabled">← —</span>`;
+    const nextHtml = nextYear !== null
       ? `<a class="year-nav-btn" href="pagina3-foto.html?anno=${nextYear}" title="Edizione ${nextYear}">${nextYear} →</a>`
-      : `<span class="year-nav-btn disabled">${nextYear} →</span>`;
+      : `<span class="year-nav-btn disabled">— →</span>`;
+
     document.getElementById('year-nav-slot').innerHTML = `
       <div class="year-nav">${prevHtml}${nextHtml}</div>
     `;
   }
-
-  const BATCH_SIZE = 12; // quante foto caricare per volta
-  let batchCursorKey = null; // ultima chiave caricata, per continuare da lì
-  let batchYear = null;
-  let batchIndex = 0; // per numerare le foto man mano che arrivano
 
   async function loadYearPhotos(year){
     const grid = document.getElementById('photo-grid');
@@ -126,12 +134,15 @@
   function renderPhotoBatch(batch){
     const grid = document.getElementById('photo-grid');
     let cardsHtml = '';
-    batch.forEach(([photoId, dataUrl]) => {
+    const votingIds = [];
+    batch.forEach(([photoId, rawVal]) => {
+      const { data, voting } = normalizePhotoValue(rawVal);
       batchIndex++;
-      cardsHtml += photoCardHtml(batchYear, photoId, batchIndex, `<img src="${dataUrl}" alt="Foto ${batchIndex} del ${batchYear}" loading="lazy" decoding="async">`, 'clicca per ingrandire');
+      cardsHtml += photoCardHtml(batchYear, photoId, batchIndex, `<img src="${data}" alt="Foto ${batchIndex} del ${batchYear}" loading="lazy" decoding="async">`, 'clicca per ingrandire', voting);
+      if(voting) votingIds.push(photoId);
     });
     grid.insertAdjacentHTML('beforeend', cardsHtml);
-    batch.forEach(([photoId]) => attachRankListener(batchYear, photoId));
+    votingIds.forEach(id => attachRankListener(batchYear, id));
     batchCursorKey = batch[batch.length - 1][0];
   }
 
