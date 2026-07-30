@@ -7,17 +7,26 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Space+Mono:wght@400;700&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<noscript><style>body{opacity:1 !important;}</style></noscript>
 </head>
 <body>
 <div class="app">
   <div id="nav-slot"></div>
 
   <div class="hero">
-    <p class="eyebrow">Dal 1966 · Gallo di Petriano (PU)</p>
-    <h1 class="title">Il Gallo <span>d'Oro</span><br>di Petriano</h1>
-    <p class="subtitle">Sessant'anni di canzoni, palchi in piazza e volti che tornano ogni estate. Questo è l'archivio fotografico del Festival — e un piccolo gioco della memoria per la comunità.</p>
+    <div class="feathers" aria-hidden="true">
+      <span class="feather" style="left:6%; animation-duration:14s; animation-delay:0s;">🪶</span>
+      <span class="feather" style="left:22%; animation-duration:19s; animation-delay:2.5s; font-size:1.1rem;">🪶</span>
+      <span class="feather" style="left:48%; animation-duration:16s; animation-delay:5s;">🪶</span>
+      <span class="feather" style="left:68%; animation-duration:21s; animation-delay:1s; font-size:1.2rem;">🪶</span>
+      <span class="feather" style="left:85%; animation-duration:17s; animation-delay:3.5s;">🪶</span>
+    </div>
 
-    <div class="story-card">
+    <p class="eyebrow reveal">Dal 1966 · Gallo di Petriano (PU)</p>
+    <h1 class="title reveal" style="transition-delay:80ms;">Il Gallo <span>d'Oro</span><br>di Petriano</h1>
+    <p class="subtitle reveal" style="transition-delay:160ms;">Sessant'anni di canzoni, palchi in piazza e volti che tornano ogni estate. Questo è l'archivio fotografico del Festival — e un piccolo gioco della memoria per la comunità.</p>
+
+    <div class="story-card reveal" style="transition-delay:240ms;">
       <h2>La nostra storia</h2>
       <p>Nel 1966, a Gallo di Petriano, un piccolo borgo dell'entroterra pesarese, il parroco del paese ebbe un'idea semplice: dare un palco alle voci nuove. Nacque così il <b>Festival Gallo d'Oro</b>, in un'Italia in cui le rassegne canore per giovani talenti erano la linfa della musica nazionale.</p>
       <p>Da allora il Gallo d'Oro è diventato l'appuntamento estivo più atteso della comunità: ogni anno, in Piazza Cavour, cantanti di ogni età ed estrazione si sfidano con brani inediti e cover, divisi per categorie — dagli "under 16" agli "over 16" — davanti a una giuria di professionisti dello spettacolo. Ai vincitori vanno il Gallo d'Oro, il Gallo d'Argento e il Gallo di Bronzo, oltre a premi storici dedicati a chi ha portato il nome di Petriano fuori dal paese.</p>
@@ -25,7 +34,7 @@
       <span class="draft-note">Bozza da rivedere — correggi pure date, nomi e dettagli che conosci meglio di me.</span>
     </div>
 
-    <div class="cta-row">
+    <div class="cta-row reveal" style="transition-delay:320ms;">
       <a class="btn btn-primary" href="pagina2-anni.html">Sfoglia gli anni →</a>
     </div>
   </div>
@@ -38,6 +47,8 @@
 <script src="script.js"></script>
 <script>
   mountNav('storia');
+  mountCartWidget();
+  initScrollReveal();
 </script>
 </body>
 </html>

@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Space+Mono:wght@400;700&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<noscript><style>body{opacity:1 !important;}</style></noscript>
 </head>
 <body>
 <div class="app">
@@ -55,6 +56,7 @@
 
   if(year) setLastYear(year); // ricorda l'anno PRIMA di disegnare il menu
   mountNav('foto');
+  mountCartWidget();
 
   if(!year){
     document.getElementById('no-year-msg').style.display = 'block';
@@ -118,6 +120,7 @@
       }
       grid.innerHTML = cardsHtml;
       ids.forEach(id => attachRankListener(year, id));
+      initScrollReveal();
       return;
     }
 
@@ -136,14 +139,15 @@
     let cardsHtml = '';
     const votingIds = [];
     batch.forEach(([photoId, rawVal]) => {
-      const { data, voting } = normalizePhotoValue(rawVal);
+      const { data, voting, caption } = normalizePhotoValue(rawVal);
       batchIndex++;
-      cardsHtml += photoCardHtml(batchYear, photoId, batchIndex, `<img src="${data}" alt="Foto ${batchIndex} del ${batchYear}" loading="lazy" decoding="async">`, 'clicca per ingrandire', voting);
+      cardsHtml += photoCardHtml(batchYear, photoId, batchIndex, `<img src="${data}" alt="Foto ${batchIndex} del ${batchYear}" loading="lazy" decoding="async">`, 'clicca per ingrandire', voting, caption);
       if(voting) votingIds.push(photoId);
     });
     grid.insertAdjacentHTML('beforeend', cardsHtml);
     votingIds.forEach(id => attachRankListener(batchYear, id));
     batchCursorKey = batch[batch.length - 1][0];
+    initScrollReveal();
   }
 
   function updateLoadMoreButton(lastBatchLength){

@@ -81,7 +81,8 @@ body{
 .lights svg{width:100%;height:100%;display:block;}
 
 /* ---------- HERO / PAGINA 1 ---------- */
-.hero{padding:40px 0 10px;}
+.hero{padding:40px 0 10px; position:relative;}
+.hero > *:not(.feathers){ position:relative; z-index:1; }
 .eyebrow{
   font-family:'Space Mono', monospace;
   font-size:0.78rem;
@@ -359,6 +360,18 @@ h1.title span{color:var(--gold-bright);}
 }
 .mine-note b{color:var(--gold-bright);}
 
+.manual-caption{
+  background:rgba(217,164,65,0.08);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:10px 14px;
+  font-size:0.85rem;
+  color:var(--cream-dim);
+  line-height:1.5;
+  margin:0 0 12px;
+}
+.manual-caption b{color:var(--gold-bright);}
+
 .rank-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px;}
 .rank-row{
   display:flex; align-items:center; gap:10px;
@@ -482,6 +495,138 @@ h1.title span{color:var(--gold-bright);}
   margin-top:34px;
 }
 
+.cart-btn{
+  width:100%;
+  background:rgba(217,164,65,0.1);
+  border:1px solid var(--gold);
+  color:var(--gold-bright);
+  border-radius:6px;
+  padding:8px 10px;
+  font-family:'Nunito Sans', sans-serif;
+  font-weight:700;
+  font-size:0.8rem;
+  cursor:pointer;
+  margin-bottom:12px;
+  transition:background .15s ease;
+}
+.cart-btn:hover{background:rgba(217,164,65,0.2);}
+
+.cart-fab{
+  position:fixed;
+  bottom:24px;
+  right:24px;
+  background:var(--gold);
+  color:var(--night-deep);
+  border:none;
+  border-radius:999px;
+  padding:14px 20px;
+  font-size:1.1rem;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:0 12px 30px rgba(0,0,0,0.4);
+  z-index:900;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  transition:transform .15s ease;
+}
+.cart-fab:hover{transform:translateY(-2px);}
+.cart-fab #cart-count{
+  background:var(--crimson);
+  color:var(--cream);
+  border-radius:999px;
+  min-width:22px;
+  height:22px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:0.75rem;
+  font-family:'Space Mono', monospace;
+  padding:0 5px;
+}
+.cart-fab.has-items{background:var(--gold-bright);}
+
+.cart-overlay{
+  position:fixed; inset:0;
+  background:rgba(11,17,32,0.85);
+  display:flex; align-items:center; justify-content:center;
+  padding:20px;
+  z-index:1000;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .2s ease;
+}
+.cart-overlay.open{opacity:1; pointer-events:auto;}
+.cart-panel{
+  background:var(--night);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:26px;
+  max-width:480px;
+  width:100%;
+  max-height:86vh;
+  overflow-y:auto;
+  box-shadow:0 30px 70px rgba(0,0,0,0.5);
+}
+.cart-header{
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:16px;
+}
+.cart-header h3{
+  font-family:'Playfair Display', serif;
+  color:var(--gold-bright);
+  margin:0;
+  font-size:1.2rem;
+}
+.cart-close{
+  background:none; border:none; color:var(--cream-dim);
+  font-size:1.1rem; cursor:pointer;
+}
+.cart-close:hover{color:var(--gold-bright);}
+.cart-items{display:flex; flex-direction:column; gap:10px; margin-bottom:18px;}
+.cart-item{
+  display:flex; align-items:center; gap:10px;
+  background:rgba(246,236,217,0.05);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:8px;
+  font-size:0.85rem;
+  color:var(--cream-dim);
+}
+.cart-item img{
+  width:52px; height:52px; object-fit:cover; border-radius:4px; flex-shrink:0;
+}
+.cart-item span{flex:1;}
+.cart-remove{
+  background:none; border:none; color:var(--crimson);
+  font-size:0.95rem; cursor:pointer; padding:4px 6px;
+}
+.cart-remove:hover{color:var(--crimson-bright);}
+.cart-form{display:flex; flex-direction:column; gap:6px;}
+.cart-form label{
+  font-size:0.75rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:0.04em; color:var(--cream-dim); margin-top:8px;
+}
+.cart-form input, .cart-form textarea{
+  background:rgba(246,236,217,0.06);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:9px 12px;
+  color:var(--cream);
+  font-family:'Nunito Sans', sans-serif;
+  font-size:0.88rem;
+}
+.cart-form textarea{min-height:70px; resize:vertical;}
+.cart-form input:focus, .cart-form textarea:focus{outline:none; border-color:var(--gold);}
+.cart-form .btn{margin-top:14px; width:100%;}
+.cart-status{
+  font-size:0.82rem;
+  color:var(--gold-bright);
+  margin:10px 0 0;
+  text-align:center;
+  min-height:1.2em;
+}
+
 .gallo-toast{
   position:fixed;
   bottom:24px;
@@ -511,6 +656,104 @@ footer{
   font-size:0.78rem;
   padding-top:40px;
 }
+
+/* ================= ANIMAZIONI E DINAMISMO ================= */
+
+/* Comparsa morbida della pagina all'apertura, invece di un flash secco */
+body{
+  opacity:0;
+  transition:opacity .5s ease;
+}
+body.page-ready{opacity:1;}
+
+/* Comparsa graduale degli elementi mentre si scorre la pagina */
+.reveal{
+  opacity:0;
+  transform:translateY(18px);
+  transition:opacity .6s ease, transform .6s ease;
+}
+.reveal.revealed{
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* Luci del festival che brillano a turno */
+@keyframes twinkle{
+  0%, 100%{ opacity:0.45; }
+  50%{ opacity:1; }
+}
+.lights .bulb{
+  animation-name:twinkle;
+  animation-iteration-count:infinite;
+  animation-timing-function:ease-in-out;
+  transform-origin:center;
+}
+
+/* Luccichio al passaggio del mouse sui biglietti anno */
+.ticket{ overflow:hidden; }
+.ticket::after{ z-index:1; } /* pallino destro sopra allo shine */
+.ticket::before{ z-index:1; } /* pallino sinistro sopra allo shine */
+.ticket .tk-shine{
+  content:'';
+  position:absolute;
+  top:0; left:-60%;
+  width:40%; height:100%;
+  background:linear-gradient(115deg, transparent, rgba(255,255,255,0.55), transparent);
+  transform:skewX(-18deg);
+  transition:left .55s ease;
+  pointer-events:none;
+}
+.ticket:hover .tk-shine{ left:120%; }
+
+/* Piume dorate che cadono lentamente (decorazione, solo dove inserite) */
+.feathers{
+  position:absolute;
+  top:0; left:0; right:0;
+  height:640px;
+  overflow:hidden;
+  pointer-events:none;
+  z-index:0;
+}
+.feather{
+  position:absolute;
+  top:-40px;
+  font-size:1.4rem;
+  opacity:0.55;
+  animation-name:feather-fall;
+  animation-timing-function:linear;
+  animation-iteration-count:infinite;
+  will-change:transform;
+}
+@keyframes feather-fall{
+  0%{ transform:translateY(0) translateX(0) rotate(0deg); }
+  50%{ transform:translateY(50vh) translateX(24px) rotate(180deg); }
+  100%{ transform:translateY(105vh) translateX(-12px) rotate(360deg); }
+}
+
+/* Piccolo "pop" sulla classifica quando arriva un nuovo voto */
+@keyframes rank-pop{
+  0%{ transform:scale(1); }
+  35%{ transform:scale(1.025); }
+  100%{ transform:scale(1); }
+}
+.rank-list.pop{ animation:rank-pop .35s ease; }
+
+/* Rimbalzo del carrello quando si aggiunge una foto */
+@keyframes cart-bounce{
+  0%{ transform:scale(1) translateY(0); }
+  30%{ transform:scale(1.18) translateY(-6px); }
+  55%{ transform:scale(0.96) translateY(1px); }
+  100%{ transform:scale(1) translateY(0); }
+}
+.cart-fab.bounce{ animation:cart-bounce .45s ease; }
+
 @media (prefers-reduced-motion: reduce){
   .ticket, .btn { transition:none; }
+  body{ opacity:1; transition:none; }
+  .reveal{ opacity:1; transform:none; transition:none; }
+  .lights .bulb{ animation:none; opacity:0.9; }
+  .ticket .tk-shine{ display:none; }
+  .feather{ animation:none; display:none; }
+  .rank-list.pop, .cart-fab.bounce{ animation:none; }
 }
+

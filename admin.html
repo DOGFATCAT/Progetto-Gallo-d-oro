@@ -126,7 +126,7 @@
     gap:16px; margin-top:20px;
   }
   .thumb{
-    background:var(--cream); border-radius:6px; padding:8px 8px 0;
+    background:var(--cream); border-radius:6px; padding:8px 8px 10px;
     position:relative;
   }
   .thumb img{width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:2px; display:block;}
@@ -162,6 +162,36 @@
     color:var(--ink-soft);
   }
   .vote-toggle:hover{opacity:0.85;}
+  .caption-input{
+    width:100%;
+    margin-top:8px;
+    border:1px solid rgba(28,23,16,0.15);
+    border-radius:4px;
+    padding:8px;
+    font-family:'Nunito Sans', sans-serif;
+    font-size:0.78rem;
+    color:var(--ink);
+    background:rgba(255,255,255,0.6);
+    resize:vertical;
+    min-height:44px;
+  }
+  .caption-input:focus{outline:none; border-color:var(--crimson);}
+  .save-caption-btn{
+    width:100%;
+    margin-top:6px;
+    background:var(--crimson);
+    color:var(--cream);
+    border:none;
+    border-radius:4px;
+    padding:7px 8px;
+    font-family:'Nunito Sans', sans-serif;
+    font-size:0.72rem;
+    font-weight:700;
+    cursor:pointer;
+    transition:background .15s ease;
+  }
+  .save-caption-btn:hover{background:var(--crimson-bright);}
+  .save-caption-btn:disabled{opacity:0.7; cursor:wait;}
   .uploading{
     display:flex; align-items:center; justify-content:center;
     aspect-ratio:4/3; background:rgba(217,164,65,0.08);
@@ -169,6 +199,40 @@
   }
   .status{margin-top:14px; font-size:0.85rem; color:var(--gold-bright); min-height:1.2em;}
   .hidden{display:none !important;}
+
+  .request-card{
+    background:rgba(246,236,217,0.04);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:16px;
+    margin-bottom:14px;
+  }
+  .request-head{
+    display:flex; justify-content:space-between; align-items:baseline;
+    flex-wrap:wrap; gap:8px;
+    font-size:0.9rem;
+    color:var(--cream);
+    margin-bottom:8px;
+  }
+  .request-head a{color:var(--gold-bright);}
+  .request-date{font-family:'Space Mono', monospace; font-size:0.72rem; color:var(--cream-dim);}
+  .request-note{
+    font-size:0.85rem; color:var(--cream-dim); font-style:italic;
+    margin:0 0 12px;
+  }
+  .request-photos{
+    display:flex; flex-wrap:wrap; gap:8px;
+    margin-bottom:12px;
+    font-size:0.8rem; color:var(--cream-dim);
+  }
+  .request-thumb{
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    font-family:'Space Mono', monospace; font-size:0.68rem; color:var(--cream-dim);
+  }
+  .request-thumb img{
+    width:64px; height:64px; object-fit:cover; border-radius:4px;
+  }
+  .request-done-btn{width:100%;}
 </style>
 </head>
 <body>
@@ -191,6 +255,12 @@
     <div class="topbar">
       <span class="who">Connesso come <b id="who-email"></b></span>
       <button class="btn btn-ghost" onclick="doLogout()">Esci</button>
+    </div>
+
+    <div class="panel">
+      <h2>📬 Richieste foto ricevute</h2>
+      <p style="color:var(--cream-dim); font-size:0.88rem; margin:0 0 12px;">Le persone scelgono le foto dal sito e inviano qui la loro richiesta con nome ed email. Rispondi tu a mano allegando le foto senza filigrana, poi segna la richiesta come evasa.</p>
+      <div id="requests-list">Caricamento…</div>
     </div>
 
     <div class="panel">
@@ -260,6 +330,7 @@
       document.getElementById('admin-view').classList.remove('hidden');
       document.getElementById('who-email').textContent = user.email;
       initActiveYearsAndSelect();
+      loadRequests();
     } else {
       document.getElementById('login-view').classList.remove('hidden');
       document.getElementById('admin-view').classList.add('hidden');
@@ -347,12 +418,92 @@
     return document.getElementById('year-select').value;
   }
 
+  // ---------------- RICHIESTE FOTO (dalle persone, tramite il carrello) ----------------
+  async function loadRequests(){
+    const listEl = document.getElementById('requests-list');
+    listEl.innerHTML = 'Caricamento…';
+    try{
+      const snap = await db.ref('requests').once('value');
+      const data = snap.val() || {};
+      const entries = Object.entries(data).sort((a,b) => (b[1].timestamp||0) - (a[1].timestamp||0));
+
+      if(entries.length === 0){
+        listEl.innerHTML = '<p style="color:var(--cream-dim); font-size:0.85rem;">Nessuna richiesta ricevuta per ora.</p>';
+        return;
+      }
+
+      listEl.innerHTML = entries.map(([id, req]) => {
+        const date = req.timestamp ? new Date(req.timestamp).toLocaleString('it-IT') : '';
+        const items = req.items || [];
+        return `
+          <div class="request-card" id="req-${id}">
+            <div class="request-head">
+              <div>
+                <b>${escapeForTextarea(req.name || '(nome non indicato)')}</b>
+                — <a href="mailto:${escapeForTextarea(req.email||'')}">${escapeForTextarea(req.email||'')}</a>
+              </div>
+              <span class="request-date">${date}</span>
+            </div>
+            ${req.note ? `<p class="request-note">"${escapeForTextarea(req.note)}"</p>` : ''}
+            <div class="request-photos" id="req-photos-${id}">${items.length} foto richieste — caricamento anteprime…</div>
+            <button class="btn btn-ghost request-done-btn" onclick="markRequestDone('${id}')">✅ Segna come evasa</button>
+          </div>
+        `;
+      }).join('');
+
+      // Carico le anteprime delle foto per ogni richiesta, una alla volta
+      for(const [id, req] of entries){
+        renderRequestPhotos(id, req.items || []);
+      }
+    }catch(e){
+      console.error('Errore caricamento richieste', e);
+      listEl.innerHTML = '<p class="error">Errore nel caricamento delle richieste.</p>';
+    }
+  }
+
+  async function renderRequestPhotos(reqId, items){
+    const el = document.getElementById(`req-photos-${reqId}`);
+    if(!el) return;
+    if(items.length === 0){ el.innerHTML = ''; return; }
+
+    let html = '';
+    for(const it of items){
+      try{
+        const snap = await db.ref(`photos/${it.year}/${it.photoId}`).once('value');
+        const { data } = normalizePhotoValue(snap.val());
+        html += data
+          ? `<div class="request-thumb"><img src="${data}" alt="Foto ${it.year}"><span>${it.year}</span></div>`
+          : `<div class="request-thumb"><span>Foto non più disponibile (${it.year})</span></div>`;
+      }catch(e){
+        html += `<div class="request-thumb"><span>Errore (${it.year})</span></div>`;
+      }
+    }
+    el.innerHTML = html;
+  }
+
+  window.markRequestDone = async function(id){
+    if(!confirm('Segnare questa richiesta come evasa? Verrà rimossa dall\'elenco.')) return;
+    try{
+      await db.ref(`requests/${id}`).remove();
+      loadRequests();
+    }catch(e){
+      console.error('Errore aggiornamento richiesta', e);
+      alert('Errore, riprova.');
+    }
+  };
+
   // Legge il valore salvato per una foto: stringa (formato vecchio, voto
-  // sempre attivo) oppure oggetto { data, voting } (formato nuovo).
+  // sempre attivo) oppure oggetto { data, voting, caption } (formato nuovo).
   function normalizePhotoValue(val){
-    if(typeof val === 'string') return { data: val, voting: true };
-    if(val && typeof val === 'object') return { data: val.data, voting: val.voting !== false };
-    return { data: null, voting: true };
+    if(typeof val === 'string') return { data: val, voting: true, caption: '' };
+    if(val && typeof val === 'object') return { data: val.data, voting: val.voting !== false, caption: val.caption || '' };
+    return { data: null, voting: true, caption: '' };
+  }
+
+  function escapeForTextarea(str){
+    const d = document.createElement('div');
+    d.innerText = str || '';
+    return d.innerHTML;
   }
 
   async function loadExisting(){
@@ -372,7 +523,7 @@
         return;
       }
       grid.innerHTML = entries.map(([id, rawVal]) => {
-        const { data: imgSrc, voting } = normalizePhotoValue(rawVal);
+        const { data: imgSrc, voting, caption } = normalizePhotoValue(rawVal);
         return `
         <div class="thumb" id="thumb-${id}">
           <img src="${imgSrc}" alt="Foto ${year}">
@@ -383,6 +534,8 @@
           <button class="vote-toggle ${voting ? 'on' : 'off'}" onclick="toggleVoting('${year}','${id}', ${voting})">
             ${voting ? '🗳️ Voto attivo' : '🚫 Voto disattivo (foto di gruppo)'}
           </button>
+          <textarea class="caption-input" data-year="${year}" data-id="${id}" placeholder="Chi si vede in questa foto? (facoltativo)">${escapeForTextarea(caption)}</textarea>
+          <button class="save-caption-btn" onclick="saveCaption(this)">💾 Salva didascalia</button>
         </div>
       `;
       }).join('');
@@ -394,13 +547,34 @@
   window.toggleVoting = async function(year, id, currentlyVoting){
     try{
       const snap = await db.ref(`photos/${year}/${id}`).once('value');
-      const { data } = normalizePhotoValue(snap.val());
-      await db.ref(`photos/${year}/${id}`).set({ data, voting: !currentlyVoting });
+      const { data, caption } = normalizePhotoValue(snap.val());
+      await db.ref(`photos/${year}/${id}`).set({ data, voting: !currentlyVoting, caption });
       loadExisting();
     }catch(e){
       console.error('Errore aggiornamento voto foto', e);
       alert('Errore nel salvataggio, riprova.');
     }
+  };
+
+  window.saveCaption = async function(btn){
+    const wrapper = btn.closest('.thumb');
+    const textarea = wrapper.querySelector('.caption-input');
+    const year = textarea.dataset.year;
+    const id = textarea.dataset.id;
+    const newCaption = textarea.value.trim();
+    const originalLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Salvo…';
+    try{
+      const snap = await db.ref(`photos/${year}/${id}`).once('value');
+      const { data, voting } = normalizePhotoValue(snap.val());
+      await db.ref(`photos/${year}/${id}`).set({ data, voting, caption: newCaption });
+      btn.textContent = '✅ Salvato';
+    }catch(e){
+      console.error('Errore salvataggio didascalia', e);
+      btn.textContent = '⚠️ Errore, riprova';
+    }
+    setTimeout(() => { btn.textContent = originalLabel; btn.disabled = false; }, 1600);
   };
 
   window.deletePhoto = async function(year, id){

@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Space+Mono:wght@400;700&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<noscript><style>body{opacity:1 !important;}</style></noscript>
 </head>
 <body>
 <div class="app">
@@ -36,6 +37,7 @@
 <script src="script.js"></script>
 <script>
   mountNav('anni');
+  mountCartWidget();
 
   const grid = document.getElementById('ticket-grid');
   const bannerSlot = document.getElementById('demo-banner-slot');
@@ -48,13 +50,15 @@
       bannerSlot.innerHTML = `<div class="demo-banner"><b>Nota:</b> non hai ancora impostato quali edizioni esistono davvero, quindi qui sotto vedi tutti gli anni dal 1966 al 2026 come demo. Vai nella pagina admin per selezionare solo gli anni in cui il Festival si è davvero svolto.</div>`;
     }
 
-    grid.innerHTML = yearsToShow.map(y => `
-      <a class="ticket" data-year="${y}" href="pagina3-foto.html?anno=${y}">
+    grid.innerHTML = yearsToShow.map((y, i) => `
+      <a class="ticket reveal" data-year="${y}" href="pagina3-foto.html?anno=${y}" style="transition-delay:${(i % 10) * 45}ms;">
+        <span class="tk-shine" aria-hidden="true"></span>
         <div class="tk-eyebrow">Ingresso · Piazza Cavour</div>
         <div class="tk-year">${y}</div>
         <div class="tk-sub">EDIZIONE · ${y} · GALLO DI PETRIANO</div>
       </a>
     `).join('');
+    initScrollReveal();
   })();
 
   function filterYears(query){

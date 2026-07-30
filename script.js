@@ -100,7 +100,9 @@ function lightsSvg(){
     const x = 10 + i*54;
     const colors = ['#d9a441','#b23a2f','#f0c869'];
     const c = colors[i % colors.length];
-    bulbs += `<circle cx="${x}" cy="18" r="4.2" fill="${c}" opacity="0.9"/>`;
+    const delay = (i * 0.22).toFixed(2);
+    const duration = (2 + (i % 4) * 0.35).toFixed(2);
+    bulbs += `<circle class="bulb" cx="${x}" cy="18" r="4.2" fill="${c}" style="animation-delay:${delay}s; animation-duration:${duration}s;"/>`;
   }
   return `<svg viewBox="0 0 980 34" preserveAspectRatio="none">
     <path d="M0,4 Q245,26 490,4 T980,4" stroke="rgba(217,164,65,0.35)" stroke-width="1.5" fill="none"/>
@@ -133,6 +135,30 @@ function renderTopNav(active){
 function mountNav(active){
   const el = document.getElementById('nav-slot');
   if(el) el.innerHTML = renderTopNav(active);
+  // Comparsa morbida della pagina, invece di un flash secco al caricamento
+  requestAnimationFrame(() => document.body.classList.add('page-ready'));
+}
+
+// ---------------- COMPARSA GRADUALE DEGLI ELEMENTI (scroll reveal) ----------------
+// Applica la classe "reveal" a un elemento per farlo comparire con una
+// leggera dissolvenza + salita quando entra nello schermo. Richiamare
+// initScrollReveal() dopo aver inserito nuovi elementi ".reveal" nel DOM.
+function initScrollReveal(){
+  const els = document.querySelectorAll('.reveal:not(.revealed)');
+  if(els.length === 0) return;
+  if(!('IntersectionObserver' in window)){
+    els.forEach(el => el.classList.add('revealed'));
+    return;
+  }
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        entry.target.classList.add('revealed');
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  els.forEach(el => obs.observe(el));
 }
 
 // =========================================================================
@@ -259,6 +285,11 @@ function renderRankFromData(year, photoId, votersObj){
       <span class="rank-count">${count} ${count===1?'voto':'voti'}</span>
     </li>
   `).join('');
+
+  // Piccolo "pop" visivo per far notare che la classifica è appena cambiata
+  el.classList.remove('pop');
+  void el.offsetWidth; // forza il riavvio dell'animazione CSS
+  el.classList.add('pop');
 }
 
 // Handler globali usati dagli attributi onsubmit/onclick generati nell'HTML
@@ -285,36 +316,46 @@ function normalizePhotoValue(val){
 function photoCardHtml(year, photoId, label, mediaHtml, hintCaption, votingEnabled, manualCaption){
   if(votingEnabled === undefined) votingEnabled = true; // retrocompatibilità
   manualCaption = (manualCaption || '').trim();
+  const isRealPhoto = mediaHtml.includes('<img');
 
   // Se la scheda contiene una foto vera (non un segnaposto), la rendo
   // cliccabile per aprirla ingrandita nel lightbox.
-  const media = mediaHtml.includes('<img')
+  const media = isRealPhoto
     ? `<div class="polaroid-img-wrap" onclick="openLightbox(this)">${mediaHtml}</div>`
     : mediaHtml;
+
+  // Pulsante carrello — solo sulle foto vere, non sui segnaposto demo
+  const cartButtonHtml = isRealPhoto
+    ? `<button class="cart-btn" onclick="toggleCartItem(${year}, '${photoId}', this)">${isInCart(year, photoId) ? '✅ Nel carrello' : '🛒 Aggiungi al carrello'}</button>`
+    : '';
+
+  const staggerDelay = (Number(label) % 8) * 55;
 
   if(!votingEnabled){
     const captionBlock = manualCaption
       ? `<p class="manual-caption"><b>Chi si vede:</b> ${escapeHtml(manualCaption)}</p>`
       : `<p class="mine-note">📷 Foto di gruppo — il gioco "chi è" non è attivo qui.</p>`;
     return `
-      <div class="photo-card">
+      <div class="photo-card reveal" style="transition-delay:${staggerDelay}ms;">
         <div class="photo-id">Scatto ${label} · ${year}</div>
         <div class="polaroid">
           ${media}
           ${hintCaption ? `<div class="polaroid-cap">${hintCaption}</div>` : ''}
         </div>
+        ${cartButtonHtml}
         ${captionBlock}
       </div>
     `;
   }
 
   return `
-    <div class="photo-card">
+    <div class="photo-card reveal" style="transition-delay:${staggerDelay}ms;">
       <div class="photo-id">Scatto ${label} · ${year}</div>
       <div class="polaroid">
         ${media}
         ${hintCaption ? `<div class="polaroid-cap">${hintCaption}</div>` : ''}
       </div>
+      ${cartButtonHtml}
       ${manualCaption ? `<p class="manual-caption"><b>Nota:</b> ${escapeHtml(manualCaption)}</p>` : ''}
       <form class="vote-form" onsubmit="return __vote(event, ${year}, '${photoId}')">
         <input type="text" placeholder="Chi credi che sia?" maxlength="40" required>
@@ -351,3 +392,189 @@ function closeLightbox(){
 function __closeLightboxOnEsc(e){
   if(e.key === 'Escape') closeLightbox();
 }
+
+// =========================================================================
+// CARRELLO RICHIESTE FOTO — la persona sceglie più foto da più anni,
+// poi invia un'unica richiesta con nome/email/nota. Salvata in
+// requests/{id} = { name, email, note, items:[{year,photoId},...], timestamp }
+// =========================================================================
+const CART_KEY = 'gallo-oro-cart';
+
+function getCart(){
+  try{
+    const raw = localStorage.getItem(CART_KEY);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){
+    return window.__memCart || [];
+  }
+}
+
+function setCart(items){
+  try{ localStorage.setItem(CART_KEY, JSON.stringify(items)); }
+  catch(e){ window.__memCart = items; }
+  updateCartBadge();
+}
+
+function isInCart(year, photoId){
+  return getCart().some(it => String(it.year) === String(year) && it.photoId === photoId);
+}
+
+function cartCount(){ return getCart().length; }
+
+window.toggleCartItem = function(year, photoId, btn){
+  const cart = getCart();
+  const idx = cart.findIndex(it => String(it.year) === String(year) && it.photoId === photoId);
+  let added = false;
+  if(idx >= 0){
+    cart.splice(idx, 1);
+    if(btn) btn.textContent = '🛒 Aggiungi al carrello';
+  } else {
+    cart.push({ year: Number(year), photoId });
+    if(btn) btn.textContent = '✅ Nel carrello';
+    added = true;
+  }
+  setCart(cart);
+  if(added){
+    const fab = document.getElementById('cart-fab');
+    if(fab){
+      fab.classList.remove('bounce');
+      void fab.offsetWidth; // forza il riavvio dell'animazione CSS
+      fab.classList.add('bounce');
+    }
+  }
+};
+
+function updateCartBadge(){
+  const badge = document.getElementById('cart-count');
+  if(badge) badge.textContent = cartCount();
+  const fab = document.getElementById('cart-fab');
+  if(fab) fab.classList.toggle('has-items', cartCount() > 0);
+}
+
+// Monta il pulsante flottante del carrello + la finestra modale.
+// Da chiamare una volta in ogni pagina (dopo mountNav).
+function mountCartWidget(){
+  if(document.getElementById('cart-fab')) return;
+
+  const fab = document.createElement('button');
+  fab.id = 'cart-fab';
+  fab.className = 'cart-fab';
+  fab.setAttribute('aria-label', 'Apri il carrello foto richieste');
+  fab.onclick = window.openCartModal;
+  fab.innerHTML = `🛒 <span id="cart-count">${cartCount()}</span>`;
+  document.body.appendChild(fab);
+
+  const overlay = document.createElement('div');
+  overlay.id = 'cart-overlay';
+  overlay.className = 'cart-overlay';
+  overlay.onclick = () => window.closeCartModal();
+  overlay.innerHTML = `
+    <div class="cart-panel" onclick="event.stopPropagation()">
+      <div class="cart-header">
+        <h3>Le foto che vuoi ricevere</h3>
+        <button class="cart-close" onclick="closeCartModal()" aria-label="Chiudi">✕</button>
+      </div>
+      <div class="cart-items" id="cart-items">Il carrello è vuoto.</div>
+      <div class="cart-form" id="cart-form-wrap" style="display:none;">
+        <label for="cart-name">Il tuo nome</label>
+        <input type="text" id="cart-name" maxlength="60" placeholder="Nome e cognome">
+        <label for="cart-email">La tua email</label>
+        <input type="email" id="cart-email" maxlength="100" placeholder="nome@esempio.it" required>
+        <label for="cart-note">Nota (facoltativa)</label>
+        <textarea id="cart-note" maxlength="300" placeholder="Es. quali foto in particolare, o altre informazioni"></textarea>
+        <button class="btn btn-primary" onclick="submitCartRequest()">Invia richiesta</button>
+        <p class="cart-status" id="cart-status"></p>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  updateCartBadge();
+}
+
+window.openCartModal = async function(){
+  const overlay = document.getElementById('cart-overlay');
+  if(!overlay) return;
+  overlay.classList.add('open');
+  await renderCartItems();
+};
+
+window.closeCartModal = function(){
+  const overlay = document.getElementById('cart-overlay');
+  if(overlay) overlay.classList.remove('open');
+};
+
+async function renderCartItems(){
+  const container = document.getElementById('cart-items');
+  const formWrap = document.getElementById('cart-form-wrap');
+  const cart = getCart();
+
+  if(cart.length === 0){
+    container.innerHTML = `<p class="rank-empty">Il carrello è vuoto. Vai su una foto e tocca "Aggiungi al carrello".</p>`;
+    formWrap.style.display = 'none';
+    return;
+  }
+
+  formWrap.style.display = 'block';
+  container.innerHTML = cart.map((it,i) => `<div class="cart-item" id="cart-item-${i}">Caricamento…</div>`).join('');
+
+  for(let i=0;i<cart.length;i++){
+    const it = cart[i];
+    const el = document.getElementById(`cart-item-${i}`);
+    try{
+      const snap = await db.ref(`photos/${it.year}/${it.photoId}`).once('value');
+      const { data } = normalizePhotoValue(snap.val());
+      if(el && data){
+        el.innerHTML = `
+          <img src="${data}" alt="Foto ${it.year}">
+          <span>Anno ${it.year}</span>
+          <button class="cart-remove" onclick="removeCartItem(${i})" aria-label="Rimuovi">✕</button>
+        `;
+      } else if(el){
+        el.innerHTML = `<span>Foto non più disponibile</span><button class="cart-remove" onclick="removeCartItem(${i})">✕</button>`;
+      }
+    }catch(e){
+      if(el) el.innerHTML = `<span>Errore caricamento</span><button class="cart-remove" onclick="removeCartItem(${i})">✕</button>`;
+    }
+  }
+}
+
+window.removeCartItem = function(index){
+  const cart = getCart();
+  cart.splice(index, 1);
+  setCart(cart);
+  renderCartItems();
+};
+
+window.submitCartRequest = async function(){
+  const name = document.getElementById('cart-name').value.trim();
+  const email = document.getElementById('cart-email').value.trim();
+  const note = document.getElementById('cart-note').value.trim();
+  const statusEl = document.getElementById('cart-status');
+  const cart = getCart();
+
+  if(cart.length === 0){ statusEl.textContent = 'Il carrello è vuoto.'; return; }
+  if(!email){ statusEl.textContent = 'Inserisci la tua email.'; return; }
+
+  statusEl.textContent = 'Invio in corso…';
+  try{
+    const newRef = db.ref('requests').push();
+    await newRef.set({
+      name: name || '(non indicato)',
+      email,
+      note,
+      items: cart,
+      timestamp: Date.now(),
+      status: 'pending'
+    });
+    setCart([]);
+    statusEl.textContent = '✅ Richiesta inviata! Ti risponderemo via email appena possibile.';
+    document.getElementById('cart-items').innerHTML = '';
+    document.getElementById('cart-name').value = '';
+    document.getElementById('cart-email').value = '';
+    document.getElementById('cart-note').value = '';
+    setTimeout(() => window.closeCartModal(), 2400);
+  }catch(e){
+    console.error('Errore invio richiesta', e);
+    statusEl.textContent = 'Errore durante l\'invio, riprova.';
+  }
+};
