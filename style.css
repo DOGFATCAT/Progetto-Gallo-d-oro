@@ -602,23 +602,50 @@ h1.title span{color:var(--gold-bright);}
   font-size:0.95rem; cursor:pointer; padding:4px 6px;
 }
 .cart-remove:hover{color:var(--crimson-bright);}
-.cart-form{display:flex; flex-direction:column; gap:6px;}
-.cart-form label{
-  font-size:0.75rem; font-weight:700; text-transform:uppercase;
-  letter-spacing:0.04em; color:var(--cream-dim); margin-top:8px;
+
+.cart-form{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  padding-top:6px;
+  border-top:1px solid var(--line);
 }
-.cart-form input, .cart-form textarea{
+.cart-field{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  width:100%;
+}
+.cart-field label{
+  font-size:0.72rem;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:0.06em;
+  color:var(--gold-bright);
+}
+.cart-form input,
+.cart-form textarea{
+  display:block;
+  width:100%;
+  box-sizing:border-box;
   background:rgba(246,236,217,0.06);
   border:1px solid var(--line);
-  border-radius:6px;
-  padding:9px 12px;
+  border-radius:8px;
+  padding:11px 14px;
   color:var(--cream);
   font-family:'Nunito Sans', sans-serif;
-  font-size:0.88rem;
+  font-size:0.9rem;
 }
-.cart-form textarea{min-height:70px; resize:vertical;}
-.cart-form input:focus, .cart-form textarea:focus{outline:none; border-color:var(--gold);}
-.cart-form .btn{margin-top:14px; width:100%;}
+.cart-form input::placeholder,
+.cart-form textarea::placeholder{color:rgba(246,236,217,0.35);}
+.cart-form textarea{min-height:78px; resize:vertical;}
+.cart-form input:focus,
+.cart-form textarea:focus{
+  outline:none;
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(217,164,65,0.15);
+}
+.cart-form .btn{margin-top:4px; width:100%;}
 .cart-status{
   font-size:0.82rem;
   color:var(--gold-bright);

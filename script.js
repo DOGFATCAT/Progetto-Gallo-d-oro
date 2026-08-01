@@ -476,12 +476,18 @@ function mountCartWidget(){
       </div>
       <div class="cart-items" id="cart-items">Il carrello è vuoto.</div>
       <div class="cart-form" id="cart-form-wrap" style="display:none;">
-        <label for="cart-name">Il tuo nome</label>
-        <input type="text" id="cart-name" maxlength="60" placeholder="Nome e cognome">
-        <label for="cart-email">La tua email</label>
-        <input type="email" id="cart-email" maxlength="100" placeholder="nome@esempio.it" required>
-        <label for="cart-note">Nota (facoltativa)</label>
-        <textarea id="cart-note" maxlength="300" placeholder="Es. quali foto in particolare, o altre informazioni"></textarea>
+        <div class="cart-field">
+          <label for="cart-name">Il tuo nome</label>
+          <input type="text" id="cart-name" maxlength="60" placeholder="Nome e cognome">
+        </div>
+        <div class="cart-field">
+          <label for="cart-email">La tua email</label>
+          <input type="email" id="cart-email" maxlength="100" placeholder="nome@esempio.it" required>
+        </div>
+        <div class="cart-field">
+          <label for="cart-note">Nota (facoltativa)</label>
+          <textarea id="cart-note" maxlength="300" placeholder="Es. quali foto in particolare, o altre informazioni"></textarea>
+        </div>
         <button class="btn btn-primary" onclick="submitCartRequest()">Invia richiesta</button>
         <p class="cart-status" id="cart-status"></p>
       </div>
