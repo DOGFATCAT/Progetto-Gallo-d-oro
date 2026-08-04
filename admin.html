@@ -579,9 +579,21 @@
 
   window.deletePhoto = async function(year, id){
     if(!confirm('Eliminare questa foto? L\'azione è definitiva.')) return;
-    await db.ref(`photos/${year}/${id}`).remove();
-    // rimuovo anche i voti associati a quella foto, così non restano orfani
-    await db.ref(`votes/${year}/${id}`).remove();
+    try{
+      await db.ref(`photos/${year}/${id}`).remove();
+    }catch(e){
+      console.error('Errore eliminazione foto', e);
+      alert('Errore durante l\'eliminazione della foto. Riprova.');
+      return;
+    }
+    try{
+      // rimuovo anche i voti associati a quella foto, così non restano orfani
+      await db.ref(`votes/${year}/${id}`).remove();
+    }catch(e){
+      // Anche se questo fallisce (es. regole non ancora aggiornate), la foto
+      // è comunque già stata eliminata: aggiorno la lista lo stesso.
+      console.error('Errore eliminazione voti collegati', e);
+    }
     loadExisting();
   };
 
