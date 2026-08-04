@@ -2,7 +2,7 @@
 
 Documento di riepilogo di tutto ciò che è stato costruito finora, per tenere traccia dello stato del sito, delle scelte fatte e di cosa resta da fare.
 
-**Ultimo aggiornamento:** 30 luglio 2026 (corretta eliminazione foto/voti in admin)
+**Ultimo aggiornamento:** 30 luglio 2026 (animazioni sempre attive)
 **Repository:** https://github.com/DOGFATCAT/Progetto-Gallo-d-oro
 **Sito online:** https://dogfatcat.github.io/Progetto-Gallo-d-oro/index.html
 
@@ -154,7 +154,7 @@ In parole semplici: chiunque può leggere foto/voti/anni attivi e votare o invia
 - **"Pop" sulla classifica** quando arriva un nuovo voto, per far notare che è cambiata
 - **Rimbalzo del carrello** 🛒 quando si aggiunge una foto
 - **Comparsa morbida della pagina** all'apertura (dissolvenza), invece di un flash secco di caricamento
-- Tutte le animazioni si disattivano automaticamente per chi ha impostato "riduci animazioni" nel proprio dispositivo (accessibilità)
+- **Nota:** le animazioni vengono mostrate sempre a tutti, per scelta esplicita — inizialmente si disattivavano per chi ha "riduci movimento" attivo nel proprio dispositivo (buona pratica di accessibilità), ma su richiesta sono state rese sempre attive indipendentemente da quella preferenza
 
 ---
 

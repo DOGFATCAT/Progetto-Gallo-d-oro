@@ -774,13 +774,3 @@ body.page-ready{opacity:1;}
 }
 .cart-fab.bounce{ animation:cart-bounce .45s ease; }
 
-@media (prefers-reduced-motion: reduce){
-  .ticket, .btn { transition:none; }
-  body{ opacity:1; transition:none; }
-  .reveal{ opacity:1; transform:none; transition:none; }
-  .lights .bulb{ animation:none; opacity:0.9; }
-  .ticket .tk-shine{ display:none; }
-  .feather{ animation:none; display:none; }
-  .rank-list.pop, .cart-fab.bounce{ animation:none; }
-}
-
