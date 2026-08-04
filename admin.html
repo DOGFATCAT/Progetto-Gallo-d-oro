@@ -226,8 +226,18 @@
     font-size:0.8rem; color:var(--cream-dim);
   }
   .request-thumb{
-    display:flex; flex-direction:column; align-items:center; gap:4px;
+    display:flex; flex-direction:column; align-items:center; gap:2px;
     font-family:'Space Mono', monospace; font-size:0.68rem; color:var(--cream-dim);
+  }
+  .request-thumb-id{
+    color:var(--gold);
+    font-size:0.62rem;
+    opacity:0.85;
+  }
+  #requests-list{
+    max-height:520px;
+    overflow-y:auto;
+    padding-right:6px;
   }
   .request-thumb img{
     width:64px; height:64px; object-fit:cover; border-radius:4px;
@@ -468,14 +478,15 @@
 
     let html = '';
     for(const it of items){
+      const shortId = (it.photoId || '').replace(/^-/, '').slice(0, 8);
       try{
         const snap = await db.ref(`photos/${it.year}/${it.photoId}`).once('value');
         const { data } = normalizePhotoValue(snap.val());
         html += data
-          ? `<div class="request-thumb"><img src="${data}" alt="Foto ${it.year}"><span>${it.year}</span></div>`
-          : `<div class="request-thumb"><span>Foto non più disponibile (${it.year})</span></div>`;
+          ? `<div class="request-thumb"><img src="${data}" alt="Foto ${it.year}"><span>${it.year}</span><span class="request-thumb-id">${shortId}</span></div>`
+          : `<div class="request-thumb"><span>Non disponibile</span><span>(${it.year})</span><span class="request-thumb-id">${shortId}</span></div>`;
       }catch(e){
-        html += `<div class="request-thumb"><span>Errore (${it.year})</span></div>`;
+        html += `<div class="request-thumb"><span>Errore</span><span>(${it.year})</span><span class="request-thumb-id">${shortId}</span></div>`;
       }
     }
     el.innerHTML = html;
