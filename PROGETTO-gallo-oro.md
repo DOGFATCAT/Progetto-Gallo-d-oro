@@ -2,7 +2,7 @@
 
 Documento di riepilogo di tutto ciò che è stato costruito finora, per tenere traccia dello stato del sito, delle scelte fatte e di cosa resta da fare.
 
-**Ultimo aggiornamento:** 30 luglio 2026 (animazioni sempre attive)
+**Ultimo aggiornamento:** 30 luglio 2026 (aggiunto banner avviso uso foto)
 **Repository:** https://github.com/DOGFATCAT/Progetto-Gallo-d-oro
 **Sito online:** https://dogfatcat.github.io/Progetto-Gallo-d-oro/index.html
 
@@ -155,6 +155,10 @@ In parole semplici: chiunque può leggere foto/voti/anni attivi e votare o invia
 - **Rimbalzo del carrello** 🛒 quando si aggiunge una foto
 - **Comparsa morbida della pagina** all'apertura (dissolvenza), invece di un flash secco di caricamento
 - **Nota:** le animazioni vengono mostrate sempre a tutti, per scelta esplicita — inizialmente si disattivavano per chi ha "riduci movimento" attivo nel proprio dispositivo (buona pratica di accessibilità), ma su richiesta sono state rese sempre attive indipendentemente da quella preferenza
+
+### Avviso uso foto (banner)
+- Fascia rossa in cima a tutte e 3 le pagine del sito pubblico, che avvisa che le foto sono di proprietà del Festival e non possono essere usate a scopo di lucro né riprodotte senza autorizzazione
+- Si può chiudere con la "✕"; una volta chiusa non ricompare più su quel dispositivo/browser (salvato in localStorage), così non è invadente per chi torna spesso sul sito
 
 ---
 

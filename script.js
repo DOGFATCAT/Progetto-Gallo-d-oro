@@ -453,6 +453,37 @@ function updateCartBadge(){
 
 // Monta il pulsante flottante del carrello + la finestra modale.
 // Da chiamare una volta in ogni pagina (dopo mountNav).
+// ---------------- AVVISO USO FOTO (banner) ----------------
+// Mostra un avviso in cima al sito che ricorda che le foto non possono
+// essere usate a scopo di lucro. Si può chiudere con la "X"; una volta
+// chiuso non ricompare più su quel dispositivo (salvato in localStorage).
+const LEGAL_NOTICE_KEY = 'gallo-oro-legal-dismissed';
+
+function isLegalNoticeDismissed(){
+  try{ return localStorage.getItem(LEGAL_NOTICE_KEY) === '1'; }
+  catch(e){ return window.__memLegalDismissed || false; }
+}
+function dismissLegalNotice(){
+  try{ localStorage.setItem(LEGAL_NOTICE_KEY, '1'); }
+  catch(e){ window.__memLegalDismissed = true; }
+  const el = document.getElementById('legal-notice');
+  if(el) el.remove();
+}
+window.dismissLegalNotice = dismissLegalNotice;
+
+function mountLegalNotice(){
+  if(isLegalNoticeDismissed()) return;
+  if(document.getElementById('legal-notice')) return;
+  const banner = document.createElement('div');
+  banner.id = 'legal-notice';
+  banner.className = 'legal-notice';
+  banner.innerHTML = `
+    <span>⚠️ Le foto pubblicate su questo sito sono di proprietà del Festival Gallo d'Oro di Petriano e vengono condivise a solo scopo di ricordo e community. <b>Non possono essere utilizzate a scopo di lucro</b> né riprodotte senza autorizzazione.</span>
+    <button onclick="dismissLegalNotice()" aria-label="Chiudi avviso">✕</button>
+  `;
+  document.body.insertBefore(banner, document.body.firstChild);
+}
+
 function mountCartWidget(){
   if(document.getElementById('cart-fab')) return;
 
