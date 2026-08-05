@@ -2,7 +2,7 @@
 
 Documento di riepilogo di tutto ciò che è stato costruito finora, per tenere traccia dello stato del sito, delle scelte fatte e di cosa resta da fare.
 
-**Ultimo aggiornamento:** 30 luglio 2026 (id foto e scroll nell'elenco richieste admin)
+**Ultimo aggiornamento:** 30 luglio 2026 (numerazione foto in admin)
 **Repository:** https://github.com/DOGFATCAT/Progetto-Gallo-d-oro
 **Sito online:** https://dogfatcat.github.io/Progetto-Gallo-d-oro/index.html
 
@@ -55,7 +55,8 @@ photos/
     {idFoto}: {
       data: "data:image/jpeg;base64,....." (l'immagine compressa),
       voting: true/false   (il gioco "chi è" è attivo su questa foto?),
-      caption: "testo"     (didascalia scritta a mano dall'admin, facoltativa)
+      caption: "testo",    (didascalia scritta a mano dall'admin, facoltativa)
+      number: "12"         (numero foto assegnato in admin, per ritrovarla facilmente)
     }
 
 meta/
@@ -140,11 +141,11 @@ In parole semplici: chiunque può leggere foto/voti/anni attivi e votare o invia
 
 ### Area Admin (`admin.html`)
 - Login protetto con email e password (Firebase Authentication — nessuna registrazione pubblica, l'utente va creato a mano dalla console Firebase)
-- Pannello **Richieste foto ricevute**: elenco delle richieste inviate dal carrello, con nome, email (cliccabile), nota, anteprime delle foto richieste (anno + identificativo della foto sotto ogni miniatura, utile per ritrovarla), e pulsante per segnarle come evase. L'elenco ha un'altezza massima con barra di scorrimento, per restare gestibile anche con molte richieste
+- Pannello **Richieste foto ricevute**: elenco delle richieste inviate dal carrello, con nome, email (cliccabile), nota, anteprime delle foto richieste (anno + numero foto sotto ogni miniatura, o l'identificativo automatico se non hai ancora assegnato un numero), e pulsante per segnarle come evase. L'elenco ha un'altezza massima con barra di scorrimento, per restare gestibile anche con molte richieste
 - Pannello **Anni presenti**: griglia di checkbox per scegliere quali anni sono realmente esistiti; il sito pubblico (pagina 2 e le frecce di pagina 3) mostra solo questi
 - Menu a tendina per scegliere l'anno da modificare, aggiornato automaticamente in base agli anni attivi selezionati
 - **Caricamento foto**: trascina o seleziona più immagini insieme; vengono compresse automaticamente (ridimensionate, qualità JPEG ridotta) prima di essere salvate, per restare leggere
-- Per ogni foto già caricata: pulsante per **attivare/disattivare il voto**, campo per scrivere/salvare una **didascalia**, pulsante per **eliminarla** (rimuove anche i voti collegati)
+- Per ogni foto già caricata: **numero foto assegnato automaticamente** (progressivo per anno) e modificabile a mano — utile per farlo corrispondere a come rinomini i file sul tuo computer; le foto in griglia si riordinano in base al numero; pulsante per **attivare/disattivare il voto**, campo per scrivere/salvare una **didascalia**, pulsante per **eliminarla** (rimuove anche i voti collegati)
 
 ### Animazioni e dinamismo (aggiunte per rendere il sito più vivo)
 - **Comparsa graduale degli elementi** mentre si scorre la pagina (testo della storia, biglietti anno, schede foto), con un leggero effetto a cascata invece che tutto insieme

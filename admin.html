@@ -162,6 +162,44 @@
     color:var(--ink-soft);
   }
   .vote-toggle:hover{opacity:0.85;}
+  .number-label{
+    display:block;
+    margin-top:8px;
+    font-family:'Nunito Sans', sans-serif;
+    font-size:0.68rem;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+    color:var(--ink-soft);
+  }
+  .number-row{
+    display:flex;
+    gap:6px;
+    margin-top:4px;
+  }
+  .number-input{
+    flex:1;
+    min-width:0;
+    border:1px solid rgba(28,23,16,0.15);
+    border-radius:4px;
+    padding:6px 8px;
+    font-family:'Space Mono', monospace;
+    font-size:0.8rem;
+    color:var(--ink);
+    background:rgba(255,255,255,0.7);
+  }
+  .number-input:focus{outline:none; border-color:var(--crimson);}
+  .save-number-btn{
+    background:var(--gold);
+    color:var(--night-deep);
+    border:none;
+    border-radius:4px;
+    padding:0 12px;
+    font-weight:800;
+    cursor:pointer;
+    transition:opacity .15s ease;
+  }
+  .save-number-btn:hover{opacity:0.85;}
   .caption-input{
     width:100%;
     margin-top:8px;
@@ -481,10 +519,11 @@
       const shortId = (it.photoId || '').replace(/^-/, '').slice(0, 8);
       try{
         const snap = await db.ref(`photos/${it.year}/${it.photoId}`).once('value');
-        const { data } = normalizePhotoValue(snap.val());
+        const { data, number } = normalizePhotoValue(snap.val());
+        const label = number ? ('#' + number) : shortId;
         html += data
-          ? `<div class="request-thumb"><img src="${data}" alt="Foto ${it.year}"><span>${it.year}</span><span class="request-thumb-id">${shortId}</span></div>`
-          : `<div class="request-thumb"><span>Non disponibile</span><span>(${it.year})</span><span class="request-thumb-id">${shortId}</span></div>`;
+          ? `<div class="request-thumb"><img src="${data}" alt="Foto ${it.year}"><span>${it.year}</span><span class="request-thumb-id">${label}</span></div>`
+          : `<div class="request-thumb"><span>Non disponibile</span><span>(${it.year})</span><span class="request-thumb-id">${label}</span></div>`;
       }catch(e){
         html += `<div class="request-thumb"><span>Errore</span><span>(${it.year})</span><span class="request-thumb-id">${shortId}</span></div>`;
       }
@@ -504,11 +543,11 @@
   };
 
   // Legge il valore salvato per una foto: stringa (formato vecchio, voto
-  // sempre attivo) oppure oggetto { data, voting, caption } (formato nuovo).
+  // sempre attivo) oppure oggetto { data, voting, caption, number } (formato nuovo).
   function normalizePhotoValue(val){
-    if(typeof val === 'string') return { data: val, voting: true, caption: '' };
-    if(val && typeof val === 'object') return { data: val.data, voting: val.voting !== false, caption: val.caption || '' };
-    return { data: null, voting: true, caption: '' };
+    if(typeof val === 'string') return { data: val, voting: true, caption: '', number: '' };
+    if(val && typeof val === 'object') return { data: val.data, voting: val.voting !== false, caption: val.caption || '', number: val.number || '' };
+    return { data: null, voting: true, caption: '', number: '' };
   }
 
   function escapeForTextarea(str){
@@ -533,14 +572,26 @@
         grid.innerHTML = '<p style="color:var(--cream-dim); font-size:0.85rem;">Nessuna foto caricata per questo anno.</p>';
         return;
       }
-      grid.innerHTML = entries.map(([id, rawVal]) => {
-        const { data: imgSrc, voting, caption } = normalizePhotoValue(rawVal);
-        return `
+      grid.innerHTML = entries
+        .map(([id, rawVal]) => ({ id, ...normalizePhotoValue(rawVal) }))
+        .sort((a, b) => {
+          const na = parseInt(a.number, 10), nb = parseInt(b.number, 10);
+          if(!isNaN(na) && !isNaN(nb)) return na - nb;
+          if(!isNaN(na)) return -1;
+          if(!isNaN(nb)) return 1;
+          return 0;
+        })
+        .map(({ id, data: imgSrc, voting, caption, number }) => `
         <div class="thumb" id="thumb-${id}">
           <img src="${imgSrc}" alt="Foto ${year}">
           <div class="cap">
-            <span>${id.slice(0,8)}</span>
+            <span>${number ? ('#' + escapeForTextarea(String(number))) : id.slice(0,8)}</span>
             <button class="del" onclick="deletePhoto('${year}','${id}')">Elimina</button>
+          </div>
+          <label class="number-label">Numero foto (per ritrovarla facilmente)</label>
+          <div class="number-row">
+            <input type="text" class="number-input" data-year="${year}" data-id="${id}" value="${escapeForTextarea(number)}" placeholder="es. 12">
+            <button class="save-number-btn" onclick="saveNumber(this)">💾</button>
           </div>
           <button class="vote-toggle ${voting ? 'on' : 'off'}" onclick="toggleVoting('${year}','${id}', ${voting})">
             ${voting ? '🗳️ Voto attivo' : '🚫 Voto disattivo (foto di gruppo)'}
@@ -548,8 +599,7 @@
           <textarea class="caption-input" data-year="${year}" data-id="${id}" placeholder="Chi si vede in questa foto? (facoltativo)">${escapeForTextarea(caption)}</textarea>
           <button class="save-caption-btn" onclick="saveCaption(this)">💾 Salva didascalia</button>
         </div>
-      `;
-      }).join('');
+      `).join('');
     }catch(e){
       grid.innerHTML = '<p class="error">Errore nel caricamento delle foto.</p>';
     }
@@ -558,8 +608,8 @@
   window.toggleVoting = async function(year, id, currentlyVoting){
     try{
       const snap = await db.ref(`photos/${year}/${id}`).once('value');
-      const { data, caption } = normalizePhotoValue(snap.val());
-      await db.ref(`photos/${year}/${id}`).set({ data, voting: !currentlyVoting, caption });
+      const { data, caption, number } = normalizePhotoValue(snap.val());
+      await db.ref(`photos/${year}/${id}`).set({ data, voting: !currentlyVoting, caption, number });
       loadExisting();
     }catch(e){
       console.error('Errore aggiornamento voto foto', e);
@@ -578,14 +628,36 @@
     btn.textContent = 'Salvo…';
     try{
       const snap = await db.ref(`photos/${year}/${id}`).once('value');
-      const { data, voting } = normalizePhotoValue(snap.val());
-      await db.ref(`photos/${year}/${id}`).set({ data, voting, caption: newCaption });
+      const { data, voting, number } = normalizePhotoValue(snap.val());
+      await db.ref(`photos/${year}/${id}`).set({ data, voting, caption: newCaption, number });
       btn.textContent = '✅ Salvato';
     }catch(e){
       console.error('Errore salvataggio didascalia', e);
       btn.textContent = '⚠️ Errore, riprova';
     }
     setTimeout(() => { btn.textContent = originalLabel; btn.disabled = false; }, 1600);
+  };
+
+  window.saveNumber = async function(btn){
+    const wrapper = btn.closest('.thumb');
+    const input = wrapper.querySelector('.number-input');
+    const year = input.dataset.year;
+    const id = input.dataset.id;
+    const newNumber = input.value.trim();
+    const originalLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '…';
+    try{
+      const snap = await db.ref(`photos/${year}/${id}`).once('value');
+      const { data, voting, caption } = normalizePhotoValue(snap.val());
+      await db.ref(`photos/${year}/${id}`).set({ data, voting, caption, number: newNumber });
+      btn.textContent = '✅';
+      setTimeout(() => loadExisting(), 500); // riordino la griglia in base al nuovo numero
+    }catch(e){
+      console.error('Errore salvataggio numero foto', e);
+      btn.textContent = '⚠️';
+      setTimeout(() => { btn.textContent = originalLabel; btn.disabled = false; }, 1600);
+    }
   };
 
   window.deletePhoto = async function(year, id){
@@ -628,18 +700,32 @@
       return;
     }
 
+    // Calcolo il prossimo numero libero per questo anno (in base al più alto già usato)
+    let nextNumber = 1;
+    try{
+      const snap = await db.ref(`photos/${year}`).once('value');
+      const existing = snap.val() || {};
+      const usedNumbers = Object.values(existing)
+        .map(v => parseInt(normalizePhotoValue(v).number, 10))
+        .filter(n => !isNaN(n));
+      if(usedNumbers.length > 0) nextNumber = Math.max(...usedNumbers) + 1;
+    }catch(e){
+      console.error('Errore calcolo numero foto', e);
+    }
+
     for(let i=0;i<files.length;i++){
       statusEl.textContent = `Carico ${i+1} di ${files.length}…`;
       try{
         const dataUrl = await compressImage(files[i], 1000, 0.72);
         const newRef = db.ref(`photos/${year}`).push();
-        await newRef.set({ data: dataUrl, voting: true });
+        await newRef.set({ data: dataUrl, voting: true, caption: '', number: String(nextNumber) });
+        nextNumber++;
       }catch(e){
         console.error(e);
         statusEl.textContent = `Errore caricando "${files[i].name}", proseguo con le altre.`;
       }
     }
-    statusEl.textContent = `Fatto: ${files.length} foto caricate.`;
+    statusEl.textContent = `Fatto: ${files.length} foto caricate (numerate automaticamente, modificabili sotto).`;
     document.getElementById('file-input').value = '';
     loadExisting();
   };
