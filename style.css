@@ -17,21 +17,38 @@
 html,body{margin:0;padding:0;}
 body{
   background:
-    radial-gradient(ellipse at 20% -10%, rgba(217,164,65,0.10), transparent 45%),
-    radial-gradient(ellipse at 90% 0%, rgba(178,58,47,0.10), transparent 40%),
-    var(--night);
+    radial-gradient(ellipse at 20% -10%, rgba(217,164,65,0.11), transparent 45%),
+    radial-gradient(ellipse at 90% 0%, rgba(178,58,47,0.11), transparent 42%),
+    radial-gradient(ellipse at 50% 100%, rgba(217,164,65,0.05), transparent 55%),
+    radial-gradient(ellipse at center, var(--night) 0%, var(--night-deep) 130%);
   color:var(--cream);
   font-family:'Nunito Sans', sans-serif;
   min-height:100vh;
+  position:relative;
 }
-.app{max-width:980px;margin:0 auto;padding:0 20px 60px;}
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  opacity:0.035;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.app{max-width:980px;margin:0 auto;padding:0 20px 60px; position:relative; z-index:1;}
 
 /* ---------- NAV ---------- */
 .topnav{
   display:flex;align-items:center;justify-content:space-between;
-  padding:22px 0 16px;
+  padding:18px 20px;
+  margin:0 -20px;
   border-bottom:1px solid var(--line);
-  margin-bottom:6px;
+  background:rgba(11,17,32,0.72);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  position:sticky;
+  top:0;
+  z-index:200;
   flex-wrap:wrap;
   gap:12px;
 }
@@ -109,12 +126,12 @@ h1.title span{color:var(--gold-bright);}
   margin:0 0 34px;
 }
 .story-card{
-  background:var(--cream);
+  background:linear-gradient(180deg, #faf3e4, var(--cream));
   color:var(--ink);
-  border-radius:6px;
+  border-radius:10px;
   padding:38px 40px;
   position:relative;
-  box-shadow:0 20px 50px rgba(0,0,0,0.35);
+  box-shadow:0 24px 60px rgba(0,0,0,0.4), 0 2px 0 rgba(255,255,255,0.5) inset;
   margin-bottom:40px;
 }
 .story-card::before{
@@ -125,8 +142,10 @@ h1.title span{color:var(--gold-bright);}
 }
 .story-card h2{
   font-family:'Playfair Display', serif;
-  font-size:1.6rem;
-  margin:10px 0 18px;
+  font-size:1.65rem;
+  margin:10px 0 20px;
+  padding-bottom:14px;
+  border-bottom:1px solid rgba(28,23,16,0.12);
   color:var(--ink);
 }
 .story-card p{
@@ -163,14 +182,30 @@ h1.title span{color:var(--gold-bright);}
   transition:transform .15s ease, box-shadow .15s ease;
 }
 .btn:hover{transform:translateY(-2px);}
-.btn-primary{background:var(--gold); color:var(--night-deep); box-shadow:0 8px 24px rgba(217,164,65,0.25);}
+.btn-primary{
+  background:linear-gradient(155deg, var(--gold-bright), var(--gold) 65%);
+  color:var(--night-deep);
+  box-shadow:0 8px 24px rgba(217,164,65,0.28), inset 0 1px 0 rgba(255,255,255,0.35);
+}
+.btn-primary:hover{box-shadow:0 12px 32px rgba(217,164,65,0.4), inset 0 1px 0 rgba(255,255,255,0.4);}
 .btn-ghost{background:transparent; color:var(--gold-bright); border:1px solid var(--gold);}
+.btn-ghost:hover{background:rgba(217,164,65,0.08);}
 
 /* ---------- PAGINA 2: SELETTORE ANNO ---------- */
 .page-head{padding:36px 0 8px;}
 .page-head h2{
   font-family:'Playfair Display', serif;
   font-size:2rem; margin:0 0 8px; color:var(--cream);
+  position:relative;
+  padding-left:18px;
+}
+.page-head h2::before{
+  content:'';
+  position:absolute;
+  left:0; top:8px; bottom:8px;
+  width:4px;
+  border-radius:2px;
+  background:linear-gradient(180deg, var(--gold-bright), var(--crimson));
 }
 .page-head p{color:var(--cream-dim); margin:0 0 30px; max-width:560px; line-height:1.6;}
 
@@ -239,15 +274,15 @@ h1.title span{color:var(--gold-bright);}
   gap:20px;
 }
 .ticket{
-  background:var(--cream);
+  background:linear-gradient(180deg, #faf3e4, var(--cream));
   color:var(--ink);
-  border-radius:8px;
+  border-radius:10px;
   padding:20px 20px 18px;
   position:relative;
   cursor:pointer;
   text-decoration:none;
   display:block;
-  box-shadow:0 12px 28px rgba(0,0,0,0.28);
+  box-shadow:0 14px 32px rgba(0,0,0,0.32), 0 1px 0 rgba(255,255,255,0.5) inset;
   transition:transform .18s ease, box-shadow .18s ease;
   border:1px solid rgba(28,23,16,0.06);
 }
@@ -289,17 +324,19 @@ h1.title span{color:var(--gold-bright);}
   margin-top:10px;
 }
 .photo-card{
-  background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0));
+  background:linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0));
   border:1px solid var(--line);
-  border-radius:10px;
+  border-radius:12px;
   padding:16px;
+  transition:border-color .2s ease, transform .2s ease;
 }
+.photo-card:hover{border-color:rgba(217,164,65,0.45); transform:translateY(-3px);}
 .polaroid{
-  background:var(--cream);
+  background:linear-gradient(180deg, #faf3e4, var(--cream));
   padding:10px 10px 0;
-  border-radius:4px;
+  border-radius:6px;
   transform:rotate(-1.2deg);
-  box-shadow:0 10px 22px rgba(0,0,0,0.3);
+  box-shadow:0 14px 28px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.5) inset;
   margin-bottom:14px;
 }
 .photo-card:nth-child(even) .polaroid{transform:rotate(1.1deg);}
@@ -709,7 +746,9 @@ footer{
   text-align:center;
   color:rgba(246,236,217,0.35);
   font-size:0.78rem;
-  padding-top:40px;
+  padding-top:34px;
+  margin-top:34px;
+  border-top:1px solid var(--line);
 }
 
 /* ================= ANIMAZIONI E DINAMISMO ================= */
@@ -801,4 +840,31 @@ body.page-ready{opacity:1;}
   100%{ transform:scale(1) translateY(0); }
 }
 .cart-fab.bounce{ animation:cart-bounce .45s ease; }
+
+/* ================= RIFINITURE MOBILE ================= */
+@media (max-width:640px){
+  .app{ padding:0 14px 40px; }
+  .topnav{ padding:14px; margin:0 -14px; }
+  .brand{ font-size:1.02rem; }
+  .brand .cresta{ font-size:1.15rem; }
+  .navlinks a, .nav-disabled{ padding:7px 12px; font-size:0.76rem; }
+
+  .hero{ padding:24px 0 6px; }
+  .story-card{ padding:26px 22px; }
+  .story-card::before{ left:22px; }
+
+  .ticket-grid{ grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:14px; }
+  .ticket{ padding:16px 16px 14px; }
+  .ticket .tk-year{ font-size:1.7rem; }
+
+  .photo-grid{ grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:18px; }
+
+  .cart-panel{ padding:20px; max-height:90vh; }
+  .cart-fab{ bottom:16px; right:16px; padding:12px 16px; font-size:1rem; }
+
+  .lightbox-overlay{ padding:10px; }
+  .lightbox-close{ top:12px; right:12px; }
+
+  .year-title-row{ flex-direction:column; align-items:flex-start; gap:10px; }
+}
 

@@ -2,7 +2,7 @@
 
 Documento di riepilogo di tutto ciò che è stato costruito finora, per tenere traccia dello stato del sito, delle scelte fatte e di cosa resta da fare.
 
-**Ultimo aggiornamento:** 30 luglio 2026 (numerazione foto in admin)
+**Ultimo aggiornamento:** 30 luglio 2026 (rifinitura grafica generale)
 **Repository:** https://github.com/DOGFATCAT/Progetto-Gallo-d-oro
 **Sito online:** https://dogfatcat.github.io/Progetto-Gallo-d-oro/index.html
 
@@ -146,6 +146,14 @@ In parole semplici: chiunque può leggere foto/voti/anni attivi e votare o invia
 - Menu a tendina per scegliere l'anno da modificare, aggiornato automaticamente in base agli anni attivi selezionati
 - **Caricamento foto**: trascina o seleziona più immagini insieme; vengono compresse automaticamente (ridimensionate, qualità JPEG ridotta) prima di essere salvate, per restare leggere
 - Per ogni foto già caricata: **numero foto assegnato automaticamente** (progressivo per anno) e modificabile a mano — utile per farlo corrispondere a come rinomini i file sul tuo computer; le foto in griglia si riordinano in base al numero; pulsante per **attivare/disattivare il voto**, campo per scrivere/salvare una **didascalia**, pulsante per **eliminarla** (rimuove anche i voti collegati)
+
+### Rifinitura grafica generale
+- Sfondo con più profondità (vignettatura + texture leggerissima), invece di un colore piatto
+- Barra di navigazione fissa in alto con effetto vetro sfocato mentre si scorre
+- Ombre più ricche e stratificate su card, biglietti anno, foto e polaroid; pulsanti con gradiente invece di colore piatto
+- Titoli di sezione con un piccolo accento decorativo dorato/cremisi
+- Rifiniture responsive dedicate per schermi piccoli (nav, biglietti, foto, carrello, lightbox)
+- Pagina admin allineata visivamente al sito pubblico (stesso sfondo, stessi accenti sui pannelli)
 
 ### Animazioni e dinamismo (aggiunte per rendere il sito più vivo)
 - **Comparsa graduale degli elementi** mentre si scorre la pagina (testo della storia, biglietti anno, schede foto), con un leggero effetto a cascata invece che tutto insieme
