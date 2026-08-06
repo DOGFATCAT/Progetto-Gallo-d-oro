@@ -8,12 +8,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Space+Mono:wght@400;700&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --night:#131b2e; --night-deep:#0b1120;
-    --gold:#d9a441; --gold-bright:#f0c869;
-    --crimson:#b23a2f; --crimson-bright:#d1503f;
-    --cream:#f6ecd9; --cream-dim:#ece0c8;
-    --ink:#1c1710; --ink-soft:#4a4335;
-    --line: rgba(217,164,65,0.25);
+    --night:#0f2430; --night-deep:#081720;
+    --gold:#d7a45c; --gold-bright:#eac088;
+    --crimson:#d1614a; --crimson-bright:#e2806a;
+    --cream:#f5ede0; --cream-dim:#ebe0cd;
+    --ink:#152530; --ink-soft:#42565e;
+    --line: rgba(215,164,92,0.28);
   }
   *{box-sizing:border-box;}
   body{
@@ -37,6 +37,43 @@
     background:linear-gradient(180deg, #faf3e4, var(--cream)); color:var(--ink);
     border-radius:12px; padding:34px; max-width:380px;
     box-shadow:0 24px 60px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.5) inset;
+  }
+  .login-screen{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:40px 20px;
+    gap:28px;
+  }
+  .login-brand{ text-align:center; }
+  .login-cresta{ font-size:2.6rem; display:block; margin-bottom:6px; }
+  .login-brand h1{
+    font-family:'Playfair Display', serif; font-weight:900;
+    font-size:2rem; margin:0 0 8px; color:var(--gold-bright);
+  }
+  .login-brand p{ color:var(--cream-dim); font-size:0.92rem; margin:0; max-width:320px; }
+  .login-card{
+    background:linear-gradient(180deg, #faf3e4, var(--cream)); color:var(--ink);
+    border-radius:14px; padding:34px; max-width:380px; width:100%;
+    box-shadow:0 24px 60px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.5) inset;
+  }
+  .password-row{ display:flex; gap:6px; align-items:stretch; }
+  .password-row input{ flex:1; min-width:0; }
+  .toggle-pw{
+    flex-shrink:0;
+    background:rgba(28,23,16,0.06);
+    border:1px solid rgba(28,23,16,0.2);
+    border-radius:6px;
+    padding:0 12px;
+    cursor:pointer;
+    font-size:1rem;
+  }
+  .toggle-pw:hover{background:rgba(28,23,16,0.1);}
+  .admin-title{
+    font-family:'Playfair Display', serif; font-weight:900;
+    font-size:1.4rem; margin:0 0 4px; color:var(--gold-bright);
   }
   .login-card label{
     display:block; font-size:0.78rem; font-weight:700;
@@ -293,24 +330,35 @@
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>🐓 Gallo d'Oro — Area riservata</h1>
-  <p class="sub">Carica qui le foto reali delle edizioni del Festival. Solo tu puoi accedere a questa pagina.</p>
 
-  <!-- LOGIN -->
+<!-- SCHERMATA DI LOGIN (a schermo intero, centrata) -->
+<div id="login-screen" class="login-screen">
+  <div class="login-brand">
+    <span class="login-cresta">🐓</span>
+    <h1>Gallo d'Oro</h1>
+    <p>Area riservata — accedi per caricare le foto e gestire il sito</p>
+  </div>
   <div id="login-view" class="login-card">
     <label for="email">Email</label>
-    <input type="email" id="email" autocomplete="username">
+    <input type="email" id="email" autocomplete="username" placeholder="tuaemail@esempio.it">
     <label for="password">Password</label>
-    <input type="password" id="password" autocomplete="current-password">
+    <div class="password-row">
+      <input type="password" id="password" autocomplete="current-password" placeholder="••••••••" onkeydown="if(event.key==='Enter') doLogin()">
+      <button type="button" class="toggle-pw" onclick="togglePasswordVisibility()" aria-label="Mostra o nascondi la password">👁️</button>
+    </div>
     <button class="btn btn-primary" onclick="doLogin()">Accedi</button>
     <div class="error" id="login-error"></div>
   </div>
+</div>
 
-  <!-- AREA ADMIN -->
+<!-- AREA ADMIN -->
+<div class="wrap">
   <div id="admin-view" class="hidden">
     <div class="topbar">
-      <span class="who">Connesso come <b id="who-email"></b></span>
+      <div>
+        <h1 class="admin-title">🐓 Gallo d'Oro — Area riservata</h1>
+        <span class="who">Connesso come <b id="who-email"></b></span>
+      </div>
       <button class="btn btn-ghost" onclick="doLogout()">Esci</button>
     </div>
 
@@ -373,23 +421,34 @@
   window.doLogin = function(){
     const email = document.getElementById('email').value.trim();
     const pass = document.getElementById('password').value;
-    document.getElementById('login-error').textContent = '';
+    const errorEl = document.getElementById('login-error');
+    const btn = document.querySelector('.login-card .btn-primary');
+    errorEl.textContent = '';
+    if(btn){ btn.disabled = true; btn.textContent = 'Accesso in corso…'; }
     auth.signInWithEmailAndPassword(email, pass).catch(err => {
-      document.getElementById('login-error').textContent = 'Accesso non riuscito: controlla email e password.';
+      errorEl.textContent = '⚠️ Accesso non riuscito: controlla email e password.';
+    }).finally(() => {
+      if(btn){ btn.disabled = false; btn.textContent = 'Accedi'; }
     });
+  };
+
+  window.togglePasswordVisibility = function(){
+    const input = document.getElementById('password');
+    const isHidden = input.type === 'password';
+    input.type = isHidden ? 'text' : 'password';
   };
 
   window.doLogout = function(){ auth.signOut(); };
 
   auth.onAuthStateChanged(user => {
     if(user){
-      document.getElementById('login-view').classList.add('hidden');
+      document.getElementById('login-screen').classList.add('hidden');
       document.getElementById('admin-view').classList.remove('hidden');
       document.getElementById('who-email').textContent = user.email;
       initActiveYearsAndSelect();
       loadRequests();
     } else {
-      document.getElementById('login-view').classList.remove('hidden');
+      document.getElementById('login-screen').classList.remove('hidden');
       document.getElementById('admin-view').classList.add('hidden');
     }
   });

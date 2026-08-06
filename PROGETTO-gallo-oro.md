@@ -2,7 +2,7 @@
 
 Documento di riepilogo di tutto ciò che è stato costruito finora, per tenere traccia dello stato del sito, delle scelte fatte e di cosa resta da fare.
 
-**Ultimo aggiornamento:** 30 luglio 2026 (rifinitura grafica generale)
+**Ultimo aggiornamento:** 30 luglio 2026 (nuova palette colori + login admin migliorato)
 **Repository:** https://github.com/DOGFATCAT/Progetto-Gallo-d-oro
 **Sito online:** https://dogfatcat.github.io/Progetto-Gallo-d-oro/index.html
 
@@ -146,6 +146,11 @@ In parole semplici: chiunque può leggere foto/voti/anni attivi e votare o invia
 - Menu a tendina per scegliere l'anno da modificare, aggiornato automaticamente in base agli anni attivi selezionati
 - **Caricamento foto**: trascina o seleziona più immagini insieme; vengono compresse automaticamente (ridimensionate, qualità JPEG ridotta) prima di essere salvate, per restare leggere
 - Per ogni foto già caricata: **numero foto assegnato automaticamente** (progressivo per anno) e modificabile a mano — utile per farlo corrispondere a come rinomini i file sul tuo computer; le foto in griglia si riordinano in base al numero; pulsante per **attivare/disattivare il voto**, campo per scrivere/salvare una **didascalia**, pulsante per **eliminarla** (rimuove anche i voti collegati)
+
+### Palette colori e login admin
+- Applicata la palette **"Blu Adriatico"**: blu petrolio profondo (`#0f2430`) con accenti oro sabbia (`#d7a45c`) e corallo/terracotta (`#d1614a`), al posto della precedente palette navy/cremisi. Cambiata una sola volta nelle variabili condivise di colore, si è propagata automaticamente a tutto il sito (nav, pulsanti, biglietti, foto, badge classifica, banner) grazie all'uso coerente delle variabili CSS
+- Erano state proposte anche altre 4 palette a tema (vinaccia/teatro, terracotta/tramonto, verde colline marchigiane, oltre alla precedente) prima di scegliere questa
+- **Pagina di login admin** ridisegnata: ora a schermo intero e centrata, con intestazione dedicata (🐓 Gallo d'Oro), occhio per mostrare/nascondere la password, stato "Accesso in corso…" durante il login, messaggio di errore più chiaro, e possibilità di premere Invio per accedere
 
 ### Rifinitura grafica generale
 - Sfondo con più profondità (vignettatura + texture leggerissima), invece di un colore piatto
