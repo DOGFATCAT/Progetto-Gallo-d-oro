@@ -484,6 +484,23 @@ function mountLegalNotice(){
   document.body.insertBefore(banner, document.body.firstChild);
 }
 
+// ---------------- PULSANTE "TORNA SU" ----------------
+function mountBackToTop(){
+  if(document.getElementById('back-to-top')) return;
+  const btn = document.createElement('button');
+  btn.id = 'back-to-top';
+  btn.className = 'back-to-top';
+  btn.setAttribute('aria-label', 'Torna in cima alla pagina');
+  btn.innerHTML = '↑';
+  btn.onclick = () => window.scrollTo({top:0, behavior:'smooth'});
+  document.body.appendChild(btn);
+
+  window.addEventListener('scroll', () => {
+    if(window.scrollY > 500) btn.classList.add('show');
+    else btn.classList.remove('show');
+  }, { passive:true });
+}
+
 function mountCartWidget(){
   if(document.getElementById('cart-fab')) return;
 

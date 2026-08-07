@@ -154,6 +154,20 @@
     font-weight:700;
   }
   .year-toggle input{margin:0;}
+  .watermark-toggle{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:14px;
+    padding:10px 14px;
+    background:rgba(217,164,65,0.07);
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:0.85rem;
+    color:var(--cream-dim);
+    cursor:pointer;
+  }
+  .watermark-toggle input{ width:16px; height:16px; accent-color:var(--gold); cursor:pointer; }
   .drop{
     border:2px dashed var(--gold);
     border-radius:10px;
@@ -382,6 +396,10 @@
     <div class="panel">
       <h2>Carica nuove foto</h2>
       <p style="color:var(--cream-dim); font-size:0.88rem; margin:0;">Puoi selezionare più foto insieme. Vengono compresse automaticamente prima del salvataggio.</p>
+      <label class="watermark-toggle">
+        <input type="checkbox" id="watermark-checkbox" checked>
+        🖋️ Applica filigrana "Gallo d'Oro di Petriano" alle foto (consigliato)
+      </label>
       <div class="drop" id="drop-zone" onclick="document.getElementById('file-input').click()">
         📷 Clicca qui o trascina le foto da caricare
         <input type="file" id="file-input" accept="image/*" multiple onchange="handleFiles(this.files)">
@@ -440,6 +458,37 @@
 
   window.doLogout = function(){ auth.signOut(); };
 
+  // ---------------- DISCONNESSIONE AUTOMATICA PER INATTIVITÀ ----------------
+  // Se non c'è nessuna interazione per 15 minuti mentre si è loggati,
+  // esce automaticamente — utile se dimentichi la pagina aperta.
+  const INACTIVITY_LIMIT_MS = 15 * 60 * 1000;
+  let inactivityTimer = null;
+  let inactivityTrackingActive = false;
+
+  function resetInactivityTimer(){
+    if(inactivityTimer) clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(() => {
+      if(auth.currentUser){
+        auth.signOut();
+        alert('Sei stato disconnesso automaticamente per inattività (15 minuti). Accedi di nuovo per continuare.');
+      }
+    }, INACTIVITY_LIMIT_MS);
+  }
+
+  function startInactivityTracking(){
+    if(inactivityTrackingActive) return;
+    inactivityTrackingActive = true;
+    ['mousemove','mousedown','keydown','scroll','touchstart'].forEach(evt => {
+      document.addEventListener(evt, resetInactivityTimer, { passive:true });
+    });
+    resetInactivityTimer();
+  }
+
+  function stopInactivityTracking(){
+    inactivityTrackingActive = false;
+    if(inactivityTimer) clearTimeout(inactivityTimer);
+  }
+
   auth.onAuthStateChanged(user => {
     if(user){
       document.getElementById('login-screen').classList.add('hidden');
@@ -447,9 +496,11 @@
       document.getElementById('who-email').textContent = user.email;
       initActiveYearsAndSelect();
       loadRequests();
+      startInactivityTracking();
     } else {
       document.getElementById('login-screen').classList.remove('hidden');
       document.getElementById('admin-view').classList.add('hidden');
+      stopInactivityTracking();
     }
   });
 
@@ -784,7 +835,8 @@
     for(let i=0;i<files.length;i++){
       statusEl.textContent = `Carico ${i+1} di ${files.length}…`;
       try{
-        const dataUrl = await compressImage(files[i], 1000, 0.72);
+        const applyWatermark = document.getElementById('watermark-checkbox').checked;
+        const dataUrl = await compressImage(files[i], 1000, 0.72, applyWatermark);
         const newRef = db.ref(`photos/${year}`).push();
         await newRef.set({ data: dataUrl, voting: true, caption: '', number: String(nextNumber) });
         nextNumber++;
@@ -798,7 +850,7 @@
     loadExisting();
   };
 
-  function compressImage(file, maxWidth, quality){
+  function compressImage(file, maxWidth, quality, applyWatermark){
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onerror = () => reject(new Error('Lettura file fallita'));
@@ -815,12 +867,34 @@
           canvas.width = w; canvas.height = h;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, w, h);
+          if(applyWatermark) drawWatermark(ctx, w, h);
           resolve(canvas.toDataURL('image/jpeg', quality));
         };
         img.src = reader.result;
       };
       reader.readAsDataURL(file);
     });
+  }
+
+  // Filigrana diagonale ripetuta, semi-trasparente: dissuade l'uso non
+  // autorizzato senza coprire troppo i volti nella foto.
+  function drawWatermark(ctx, w, h){
+    const text = "GALLO D'ORO DI PETRIANO";
+    const fontSize = Math.max(14, Math.round(w * 0.04));
+    ctx.save();
+    ctx.globalAlpha = 0.16;
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `bold ${fontSize}px 'Nunito Sans', Arial, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.translate(w / 2, h / 2);
+    ctx.rotate(-Math.PI / 7);
+    const spacing = fontSize * 3.2;
+    const span = Math.max(w, h) * 1.5;
+    for(let y = -span; y <= span; y += spacing){
+      ctx.fillText(text, 0, y);
+    }
+    ctx.restore();
   }
 })();
 </script>

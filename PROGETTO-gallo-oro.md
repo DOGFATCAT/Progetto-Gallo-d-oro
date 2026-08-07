@@ -2,7 +2,7 @@
 
 Documento di riepilogo di tutto ciò che è stato costruito finora, per tenere traccia dello stato del sito, delle scelte fatte e di cosa resta da fare.
 
-**Ultimo aggiornamento:** 30 luglio 2026 (nuova palette colori + login admin migliorato)
+**Ultimo aggiornamento:** 30 luglio 2026 (filigrana, torna su, sicurezza inattività, anteprima social)
 **Repository:** https://github.com/DOGFATCAT/Progetto-Gallo-d-oro
 **Sito online:** https://dogfatcat.github.io/Progetto-Gallo-d-oro/index.html
 
@@ -147,6 +147,13 @@ In parole semplici: chiunque può leggere foto/voti/anni attivi e votare o invia
 - **Caricamento foto**: trascina o seleziona più immagini insieme; vengono compresse automaticamente (ridimensionate, qualità JPEG ridotta) prima di essere salvate, per restare leggere
 - Per ogni foto già caricata: **numero foto assegnato automaticamente** (progressivo per anno) e modificabile a mano — utile per farlo corrispondere a come rinomini i file sul tuo computer; le foto in griglia si riordinano in base al numero; pulsante per **attivare/disattivare il voto**, campo per scrivere/salvare una **didascalia**, pulsante per **eliminarla** (rimuove anche i voti collegati)
 
+### Filigrana, torna su, sicurezza e anteprima social
+- **Filigrana sulle foto**: applicata automaticamente alle nuove foto caricate (testo diagonale semi-trasparente ripetuto "Gallo d'Oro di Petriano"), disattivabile con un checkbox in admin se serve caricare qualche foto senza. Le foto già caricate in precedenza non vengono modificate retroattivamente
+- **Pulsante "torna su"**: compare in basso a sinistra dopo aver scorso un po' la pagina, riporta in cima con un click
+- **Disconnessione automatica admin**: se non c'è nessuna interazione per 15 minuti mentre sei loggato, esci automaticamente per sicurezza
+- **Anteprima social**: generata un'immagine di copertina (`og-image.png`) e aggiunti i meta tag Open Graph/Twitter a tutte e 3 le pagine, così condividendo il link su WhatsApp/Facebook compare un'anteprima curata invece di un link nudo
+- **Ancora da fare**: bloccare le regole del database a una sola email admin, e collegare l'invio email automatico delle richieste del carrello — in attesa che l'admin comunichi l'indirizzo email da usare
+
 ### Palette colori e login admin
 - Applicata la palette **"Blu Adriatico"**: blu petrolio profondo (`#0f2430`) con accenti oro sabbia (`#d7a45c`) e corallo/terracotta (`#d1614a`), al posto della precedente palette navy/cremisi. Cambiata una sola volta nelle variabili condivise di colore, si è propagata automaticamente a tutto il sito (nav, pulsanti, biglietti, foto, badge classifica, banner) grazie all'uso coerente delle variabili CSS
 - Erano state proposte anche altre 4 palette a tema (vinaccia/teatro, terracotta/tramonto, verde colline marchigiane, oltre alla precedente) prima di scegliere questa
@@ -189,7 +196,7 @@ In parole semplici: chiunque può leggere foto/voti/anni attivi e votare o invia
 
 ## 6. Cosa NON è stato ancora fatto (prossimi passi possibili)
 
-- **Filigrana sulle foto pubbliche**: prevista ma non ancora implementata
+- ~~Filigrana sulle foto pubbliche~~ — fatto (vedi sezione sopra)
 - **Invio email automatico**: quando verrà scelto l'indirizzo email di destinazione, si può aggiungere un `mailto:` automatico che apre il client email del visitatore con il messaggio già pronto, in aggiunta all'elenco richieste in admin (già funzionante)
 - **Sicurezza extra dell'area admin**, discussa ma non completata:
   - Bloccare le regole del database a una email specifica invece che "chiunque sia loggato"
