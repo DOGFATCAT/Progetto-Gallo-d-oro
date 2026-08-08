@@ -4,49 +4,58 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gallo d'Oro di Petriano — Storia</title>
-<meta name="description" content="L'archivio fotografico del Festival Gallo d'Oro di Petriano, dal 1966: sfoglia le foto di ogni edizione e aiuta a ricordare chi era chi sul palco.">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Gallo d'Oro di Petriano — Archivio fotografico">
-<meta property="og:description" content="Sessant'anni di canzoni e volti in piazza. Sfoglia le foto del Festival e gioca a indovinare chi c'è negli scatti.">
-<meta property="og:image" content="https://dogfatcat.github.io/Progetto-Gallo-d-oro/og-image.png">
-<meta property="og:url" content="https://dogfatcat.github.io/Progetto-Gallo-d-oro/index.html">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Gallo d'Oro di Petriano — Archivio fotografico">
-<meta name="twitter:description" content="Sessant'anni di canzoni e volti in piazza. Sfoglia le foto del Festival e gioca a indovinare chi c'è negli scatti.">
-<meta name="twitter:image" content="https://dogfatcat.github.io/Progetto-Gallo-d-oro/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Space+Mono:wght@400;700&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-<noscript><style>body{opacity:1 !important;}</style></noscript>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<noscript><style>body{opacity:1 !important;} .reveal{opacity:1 !important;transform:none !important;}</style></noscript>
 </head>
 <body>
 <div class="app">
   <div id="nav-slot"></div>
 
-  <div class="hero">
-    <div class="feathers" aria-hidden="true">
-      <span class="feather" style="left:6%; animation-duration:14s; animation-delay:0s;">🪶</span>
-      <span class="feather" style="left:22%; animation-duration:19s; animation-delay:2.5s; font-size:1.1rem;">🪶</span>
-      <span class="feather" style="left:48%; animation-duration:16s; animation-delay:5s;">🪶</span>
-      <span class="feather" style="left:68%; animation-duration:21s; animation-delay:1s; font-size:1.2rem;">🪶</span>
-      <span class="feather" style="left:85%; animation-duration:17s; animation-delay:3.5s;">🪶</span>
-    </div>
-
-    <p class="eyebrow reveal">Dal 1966 · Gallo di Petriano (PU)</p>
+  <section class="hero">
+    <div class="hero-badge reveal">Dal 1966 · Gallo di Petriano (PU)</div>
     <h1 class="title reveal" style="transition-delay:80ms;">Il Gallo <span>d'Oro</span><br>di Petriano</h1>
     <p class="subtitle reveal" style="transition-delay:160ms;">Sessant'anni di canzoni, palchi in piazza e volti che tornano ogni estate. Questo è l'archivio fotografico del Festival — e un piccolo gioco della memoria per la comunità.</p>
-
-    <div class="story-card reveal" style="transition-delay:240ms;">
-      <h2>La nostra storia</h2>
-      <p>Nel 1966, a Gallo di Petriano, un piccolo borgo dell'entroterra pesarese, il parroco del paese ebbe un'idea semplice: dare un palco alle voci nuove. Nacque così il <b>Festival Gallo d'Oro</b>, in un'Italia in cui le rassegne canore per giovani talenti erano la linfa della musica nazionale.</p>
-      <p>Da allora il Gallo d'Oro è diventato l'appuntamento estivo più atteso della comunità: ogni anno, in Piazza Cavour, cantanti di ogni età ed estrazione si sfidano con brani inediti e cover, divisi per categorie — dagli "under 16" agli "over 16" — davanti a una giuria di professionisti dello spettacolo. Ai vincitori vanno il Gallo d'Oro, il Gallo d'Argento e il Gallo di Bronzo, oltre a premi storici dedicati a chi ha portato il nome di Petriano fuori dal paese.</p>
-      <p>Il Festival ha attraversato momenti di pausa e altrettanti ritorni, ma non ha mai smesso di essere, prima di tutto, una festa di popolo: organizzata dalla Pro Loco, sostenuta dal Comune e portata avanti dal lavoro instancabile dei volontari. Oggi, a distanza di sessant'anni dalla prima edizione, questo archivio raccoglie le foto di ogni edizione — e chiede a voi di aiutarci a ricordare chi era chi sul palco.</p>
-      <span class="draft-note">Bozza da rivedere — correggi pure date, nomi e dettagli che conosci meglio di me.</span>
-    </div>
-
-    <div class="cta-row reveal" style="transition-delay:320ms;">
+    <div class="reveal" style="transition-delay:240ms;">
       <a class="btn btn-primary" href="pagina2-anni.html">Sfoglia gli anni →</a>
     </div>
+  </section>
+
+  <section class="section-head reveal">
+    <h2>La nostra storia</h2>
+    <p>Dal primo palco in Piazza Cavour alla community di oggi: una storia fatta di musica, volontariato e memoria collettiva.</p>
+  </section>
+
+  <div class="bento-grid">
+    <div class="bento-item wide glass glass-gold reveal">
+      <h3>🎤 Le origini</h3>
+      <p>Nel <span class="highlight">1966</span>, a Gallo di Petriano, un piccolo borgo dell'entroterra pesarese, il parroco del paese ebbe un'idea semplice: dare un palco alle voci nuove. Nacque così il <b>Festival Gallo d'Oro</b>, in un'Italia in cui le rassegne canore per giovani talenti erano la linfa della musica nazionale.</p>
+      <p>Da allora il Gallo d'Oro è diventato l'appuntamento estivo più atteso della comunità: ogni anno, in Piazza Cavour, cantanti di ogni età ed estrazione si sfidano con brani inediti e cover, divisi per categorie — dagli "under 16" agli "over 16" — davanti a una giuria di professionisti dello spettacolo.</p>
+    </div>
+
+    <div class="bento-item glass reveal" style="transition-delay:100ms;">
+      <h3>🏆 I premi</h3>
+      <p>Ai vincitori vanno il <span class="highlight">Gallo d'Oro</span>, il <span class="highlight">Gallo d'Argento</span> e il <span class="highlight">Gallo di Bronzo</span>, oltre a premi storici dedicati a chi ha portato il nome di Petriano fuori dal paese.</p>
+    </div>
+
+    <div class="bento-item glass reveal" style="transition-delay:200ms;">
+      <h3>🤝 La comunità</h3>
+      <p>Il Festival è organizzato dalla <b>Pro Loco</b>, sostenuto dal <b>Comune</b> e portato avanti dal lavoro instancabile dei <b>volontari</b>. Una festa di popolo che resiste e rinasce ogni estate.</p>
+    </div>
+
+    <div class="bento-item wide glass reveal" style="transition-delay:100ms;">
+      <h3>📸 L'archivio</h3>
+      <p>Oggi, a distanza di sessant'anni dalla prima edizione, questo archivio raccoglie le foto di ogni edizione — e chiede a voi di aiutarci a ricordare <span class="highlight">chi era chi sul palco</span>. Scorri le foto, vota i nomi che riconosci, e aiuta la comunità a ricostruire la memoria del Festival.</p>
+      <span class="draft-pill">⚠️ Bozza da rivedere — correggi pure date, nomi e dettagli</span>
+    </div>
+  </div>
+
+  <div class="reveal" style="text-align:center; margin-top:var(--space-10);">
+    <a class="btn btn-primary" href="pagina2-anni.html">Entra nell'archivio →</a>
   </div>
 
   <footer>Festival Gallo d'Oro · Gallo di Petriano (PU) · dal 1966</footer>
@@ -59,8 +68,13 @@
   mountNav('storia');
   mountCartWidget();
   mountLegalNotice();
-  mountBackToTop();
   initScrollReveal();
+
+  if (typeof gsap !== 'undefined') {
+    gsap.from('.hero-badge', { opacity: 0, y: 20, duration: 0.8, delay: 0.2, ease: 'power2.out' });
+    gsap.from('.title', { opacity: 0, y: 30, duration: 1, delay: 0.4, ease: 'power2.out' });
+    gsap.from('.subtitle', { opacity: 0, y: 20, duration: 0.8, delay: 0.6, ease: 'power2.out' });
+  }
 </script>
 </body>
 </html>

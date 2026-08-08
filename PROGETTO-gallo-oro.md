@@ -2,7 +2,7 @@
 
 Documento di riepilogo di tutto ciò che è stato costruito finora, per tenere traccia dello stato del sito, delle scelte fatte e di cosa resta da fare.
 
-**Ultimo aggiornamento:** 30 luglio 2026 (filigrana, torna su, sicurezza inattività, anteprima social)
+**Ultimo aggiornamento:** 7 agosto 2026 (redesign completo — glassmorphism, GSAP, design system moderno)
 **Repository:** https://github.com/DOGFATCAT/Progetto-Gallo-d-oro
 **Sito online:** https://dogfatcat.github.io/Progetto-Gallo-d-oro/index.html
 
@@ -29,9 +29,9 @@ Tutti i file vivono nella stessa cartella del repository GitHub (necessario per 
 | `index.html` | Pagina 1 — la storia del Festival (home del sito) |
 | `pagina2-anni.html` | Pagina 2 — selezione dell'anno, con ricerca |
 | `pagina3-foto.html` | Pagina 3 — foto dell'anno scelto, voto, classifica, carrello |
-| `style.css` | Tutto lo stile grafico, condiviso da ogni pagina |
-| `script.js` | Tutta la logica condivisa: Firebase, dati, voti, navigazione, lightbox, carrello |
-| `admin.html` | Area riservata (login) per caricare foto e gestire il sito |
+| `style.css` | Tutto lo stile grafico, condiviso da ogni pagina — **completamente ridisegnato** |
+| `script.js` | Tutta la logica condivisa: Firebase, dati, voti, navigazione, lightbox, carrello — **modularizzato e modernizzato** |
+| `admin.html` | Area riservata (login) per caricare foto e gestire il sito — **completamente ridisegnata** |
 
 **Importante:** i nomi dei file non vanno cambiati, perché sono richiamati tra loro per nome esatto (link, `<script src="...">`, `<link href="...">`).
 
@@ -114,11 +114,98 @@ In parole semplici: chiunque può leggere foto/voti/anni attivi e votare o invia
 
 ---
 
-## 4. Tutte le funzionalità costruite finora
+## 4. Redesign completo — Agosto 2026
+
+### Motivazione
+Il sito è stato completamente ridisegnato per passare da un'estetica "festival di paese tradizionale" a un design **moderno, premium e spazioso**, ispirato ai siti dei festival culturali contemporanei. L'obiettivo era rendere l'esperienza più godibile, professionale e memorabile, senza perdere l'identità calda e comunitaria del Gallo d'Oro.
+
+### Design System
+- **Glassmorphism** su tutte le card, pannelli e la navigazione: sfondi semi-trasparenti con `backdrop-filter: blur(20px)`, bordi sottili luminosi, ombre profonde
+- **Gradiente aurora animato** sullo sfondo: tre radial-gradient (oro, corallo, oro tenue) che si muovono delicatamente con un'animazione CSS di 20s, creando profondità senza mai distrarre
+- **Texture noise** sovrapposta a opacità 0.025 per un effetto "carta vellutata" che toglie la sensazione di digitale freddo
+- **Design token CSS**: tutti i colori, spaziature, raggi, font e transizioni sono variabili CSS (`:root`), modificabili in un solo punto
+
+### Nuova palette colori
+La precedente palette "Blu Adriatico" (`#0f2430`, `#d7a45c`, `#d1614a`) è stata sostituita da una scala più raffinata:
+- **Sfondo**: `#060a12` (notte profonda, quasi nero-blu)
+- **Oro**: scala da `#f9c94a` a `#d4a03a` con glow `rgba(212,160,58,0.35)`
+- **Accento corallo**: `#e85d4e` / `#ff7a6b` con glow proprio
+- **Testo**: `#f2ede6` (bianco caldo), con opacità variabile per gerarchia
+- **Bordi**: `rgba(255,255,255,0.06)` base, `rgba(212,160,58,0.25)` per elementi dorati
+
+### Nuova tipografia
+- **Display**: `Space Grotesk` (titoli, numeri grandi, brand) — moderna, geometrica, con carattere
+- **Body**: `Inter` (testo corrente, pulsanti, form) — leggibilissima, ottima a tutte le dimensioni
+- **Mono**: `JetBrains Mono` (badge, anni, dettagli tecnici, contatori) — monospace con personalità
+
+### Navigazione
+- **Pillola fluttuante** centrata in alto, invece della barra fissa a tutta larghezza. È compatta, elegante, con effetto vetro sfocato e bordo sottile
+- Divisore verticale tra brand e link
+- Link attivo con sfondo oro gradiente e ombra dorata
+- Su mobile si compatta automaticamente senza rompersi
+
+### Pagina Storia (`index.html`)
+- **Hero cinematografica**: badge animato con punto pulsante, titolo enorme con gradiente text-fill, sottotitolo centrato, CTA prominente
+- **Layout Bento**: la storia è racchiusa in una griglia di card "a mosaico" (2 colonne su desktop, 1 su mobile) con bordi dorati al hover. Ogni card ha un argomento specifico (origini, premi, comunità, archivio)
+- Animazione di entrata GSAP sulla hero (badge, titolo, sottotitolo compaiono in sequenza)
+- Scroll-triggered reveal su tutte le card
+
+### Pagina Scegli anno (`pagina2-anni.html`)
+- **Card anno ridisegnate**: sfondo glass, bordo con gradiente oro/corallo che appare al hover, numero anno con gradiente text-fill, shine che attraversa la card al passaggio del mouse
+- **Effetto 3D tilt**: su desktop, le card seguono leggermente il movimento del mouse con `perspective` e `rotateX/Y` (disattivato su touch)
+- Ricerca con icona lente e pulsante cancella, stile glass
+- Banner demo con bordo tratteggiato dorato
+
+### Pagina Foto (`pagina3-foto.html`)
+- **Galleria masonry-like**: card foto con bordi arrotondati, overflow hidden, immagine che scala al hover con transizione lenta
+- **Overlay gradiente** in basso che appare al hover, con icona zoom
+- **Lightbox cinematico**: sfondo scuro con blur, immagine che entra con scale da 0.95 a 1, pulsante chiudi che ruota al hover. Blocca lo scroll del body
+- **Skeleton loading** nel carrello: placeholder animati mentre si caricano le anteprime
+- Frecce anno prev/next in stile pillola glass
+- Back link stilizzato con freccia
+
+### Area Admin (`admin.html`)
+- **Login ridisegnato**: schermo intero centrato, card glass con bordo sottile, brand con glow dorato, input con focus glow dorato, toggle password con occhio
+- **Pannelli admin**: stesso stile glass delle card pubbliche, con accent line (gradiente oro-corallo) a sinistra dei titoli
+- Griglia foto admin con hover sui bordi
+- Drop zone per upload con bordo tratteggiato dorato e stati hover/dragover
+- Stati di caricamento e messaggi di errore coerenti con la nuova palette
+
+### Animazioni e micro-interazioni
+- **GSAP + ScrollTrigger**: reveal degli elementi con fade + translateY quando entrano nel viewport. Fallback nativo per chi ha JavaScript disabilitato
+- **Hero entrance**: sequenza coordinata (badge → titolo → sottotitolo → CTA) con easing `power2.out`
+- **Rank list pop**: quando arriva un nuovo voto, la classifica fa un leggero "pump" visivo con GSAP
+- **Cart bounce**: quando si aggiunge una foto al carrello, il FAB fa un rimbalzo elastico (`cubic-bezier(0.34,1.56,0.64,1)`)
+- **Legal banner**: chiusura animata con GSAP (altezza e opacità a zero) prima della rimozione
+- **Luci festival**: sempre presenti, con colori aggiornati alla nuova palette (oro, corallo, oro chiaro)
+- **Page ready fade**: il body parte da `opacity: 0` e passa a `1` quando il JS monta la nav
+- **Pulsanti**: shine effect che attraversa il pulsante al hover (gradiente bianco semi-trasparente in movimento)
+
+### script.js — Modularizzazione
+- Codice riorganizzato in sezioni ben separate: Firebase, Identity, Year Memory, Demo Data, Utilities, Navigation, Scroll Reveal, Votes, Lightbox, Cart, Legal Notice
+- Funzioni esportate su `window` solo dove necessario (handler inline)
+- Anti-spam, escape HTML/attr, normalizePhotoValue tutto conservato e funzionante
+- `initYearCardTilt()` funzione dedicata per l'effetto 3D sulle card anno
+
+### Responsive
+- Breakpoint principale a 768px
+- Nav: brand più piccolo, link compatti, nessun divider su mobile
+- Bento grid: card a larghezza piena su mobile
+- Year grid: 2 colonne su schermi stretti, auto-fill su desktop
+- Photo grid: singola colonna su <480px, auto-fill sopra
+- Admin grid: colonne più strette su mobile
+- Lightbox: padding ridotto, pulsante chiudi più piccolo
+- Cart panel: max-height 90vh su mobile
+
+### Scrollbar personalizzata
+- Track trasparente, thumb bianco a 10% opacità con hover a 18%, bordi arrotondati. Coerente con l'estetica dark.
+
+---
+
+## 5. Tutte le funzionalità costruite finora (funzionali nel redesign)
 
 ### Struttura di base
 - Sito diviso in 3 pagine reali (non più una singola app con stati JS): storia, scelta anno, foto — collegate da link veri, non da JavaScript
-- Design a tema festival di paese: sfondo notturno, oro/cremisi, luci a festone, biglietti "ticket" per gli anni, foto in stile polaroid
 
 ### Pagina Storia
 - Bozza di testo storico scritta sulla base di informazioni reali trovate online (fondazione 1966, Pro Loco, premi Gallo d'Oro/Argento/Bronzo) — **da rivedere e correggere con i dettagli che l'amministratore conosce meglio**
@@ -129,9 +216,9 @@ In parole semplici: chiunque può leggere foto/voti/anni attivi e votare o invia
 - Mostra **solo gli anni impostati come "attivi"** dall'admin (il Festival è saltato alcuni anni); se l'admin non ha ancora impostato nulla, mostra tutti gli anni come demo con un avviso
 
 ### Pagina Foto
-- Foto mostrate in stile polaroid, con segnaposto quando non ci sono ancora foto reali per un anno
+- Foto mostrate in stile card moderno, con segnaposto quando non ci sono ancora foto reali per un anno
 - **Voto e classifica**: si scrive un nome sotto una foto, oppure si tocca un nome già proposto per votarlo; un voto per persona per foto (identificata tramite il browser, non un vero login), sovrascrivibile se si cambia idea
-- **Anti-spam**: 4 secondi minimi tra un voto e l'altro (con avviso), più una validazione lato database (max 40 caratteri, non vuoto)
+- **Anti-spam**: 4 secondi minimi tra un voto e l'altro (con avviso toast), più una validazione lato database (max 40 caratteri, non vuoto)
 - **Lightbox**: click su una foto reale per vederla ingrandita a schermo intero
 - **Frecce anno precedente/successivo**: navigano solo tra gli anni realmente attivi (non su anni senza foto)
 - **Caricamento a blocchi**: le foto si caricano 12 alla volta con un pulsante "Carica altre foto", pensato per reggere bene anche 100-150+ foto per anno senza rallentare l'apertura della pagina
@@ -147,43 +234,13 @@ In parole semplici: chiunque può leggere foto/voti/anni attivi e votare o invia
 - **Caricamento foto**: trascina o seleziona più immagini insieme; vengono compresse automaticamente (ridimensionate, qualità JPEG ridotta) prima di essere salvate, per restare leggere
 - Per ogni foto già caricata: **numero foto assegnato automaticamente** (progressivo per anno) e modificabile a mano — utile per farlo corrispondere a come rinomini i file sul tuo computer; le foto in griglia si riordinano in base al numero; pulsante per **attivare/disattivare il voto**, campo per scrivere/salvare una **didascalia**, pulsante per **eliminarla** (rimuove anche i voti collegati)
 
-### Filigrana, torna su, sicurezza e anteprima social
-- **Filigrana sulle foto**: applicata automaticamente alle nuove foto caricate (testo diagonale semi-trasparente ripetuto "Gallo d'Oro di Petriano"), disattivabile con un checkbox in admin se serve caricare qualche foto senza. Le foto già caricate in precedenza non vengono modificate retroattivamente
-- **Pulsante "torna su"**: compare in basso a sinistra dopo aver scorso un po' la pagina, riporta in cima con un click
-- **Disconnessione automatica admin**: se non c'è nessuna interazione per 15 minuti mentre sei loggato, esci automaticamente per sicurezza
-- **Anteprima social**: generata un'immagine di copertina (`og-image.png`) e aggiunti i meta tag Open Graph/Twitter a tutte e 3 le pagine, così condividendo il link su WhatsApp/Facebook compare un'anteprima curata invece di un link nudo
-- **Ancora da fare**: bloccare le regole del database a una sola email admin, e collegare l'invio email automatico delle richieste del carrello — in attesa che l'admin comunichi l'indirizzo email da usare
-
-### Palette colori e login admin
-- Applicata la palette **"Blu Adriatico"**: blu petrolio profondo (`#0f2430`) con accenti oro sabbia (`#d7a45c`) e corallo/terracotta (`#d1614a`), al posto della precedente palette navy/cremisi. Cambiata una sola volta nelle variabili condivise di colore, si è propagata automaticamente a tutto il sito (nav, pulsanti, biglietti, foto, badge classifica, banner) grazie all'uso coerente delle variabili CSS
-- Erano state proposte anche altre 4 palette a tema (vinaccia/teatro, terracotta/tramonto, verde colline marchigiane, oltre alla precedente) prima di scegliere questa
-- **Pagina di login admin** ridisegnata: ora a schermo intero e centrata, con intestazione dedicata (🐓 Gallo d'Oro), occhio per mostrare/nascondere la password, stato "Accesso in corso…" durante il login, messaggio di errore più chiaro, e possibilità di premere Invio per accedere
-
-### Rifinitura grafica generale
-- Sfondo con più profondità (vignettatura + texture leggerissima), invece di un colore piatto
-- Barra di navigazione fissa in alto con effetto vetro sfocato mentre si scorre
-- Ombre più ricche e stratificate su card, biglietti anno, foto e polaroid; pulsanti con gradiente invece di colore piatto
-- Titoli di sezione con un piccolo accento decorativo dorato/cremisi
-- Rifiniture responsive dedicate per schermi piccoli (nav, biglietti, foto, carrello, lightbox)
-- Pagina admin allineata visivamente al sito pubblico (stesso sfondo, stessi accenti sui pannelli)
-
-### Animazioni e dinamismo (aggiunte per rendere il sito più vivo)
-- **Comparsa graduale degli elementi** mentre si scorre la pagina (testo della storia, biglietti anno, schede foto), con un leggero effetto a cascata invece che tutto insieme
-- **Luci del festival che brillano** a turno (twinkle), invece di stare ferme
-- **Luccichio al passaggio del mouse** sui biglietti degli anni (un lampo di luce li attraversa in diagonale)
-- **Piumette dorate 🪶** che cadono lentamente nella parte alta della pagina Storia, a tema con il gallo
-- **"Pop" sulla classifica** quando arriva un nuovo voto, per far notare che è cambiata
-- **Rimbalzo del carrello** 🛒 quando si aggiunge una foto
-- **Comparsa morbida della pagina** all'apertura (dissolvenza), invece di un flash secco di caricamento
-- **Nota:** le animazioni vengono mostrate sempre a tutti, per scelta esplicita — inizialmente si disattivavano per chi ha "riduci movimento" attivo nel proprio dispositivo (buona pratica di accessibilità), ma su richiesta sono state rese sempre attive indipendentemente da quella preferenza
-
 ### Avviso uso foto (banner)
-- Fascia rossa in cima a tutte e 3 le pagine del sito pubblico, che avvisa che le foto sono di proprietà del Festival e non possono essere usate a scopo di lucro né riprodotte senza autorizzazione
-- Si può chiudere con la "✕"; una volta chiusa non ricompare più su quel dispositivo/browser (salvato in localStorage), così non è invadente per chi torna spesso sul sito
+- Fascia in cima a tutte e 3 le pagine del sito pubblico, con sfondo gradiente corallo-trasparente, che avvisa che le foto sono di proprietà del Festival e non possono essere usate a scopo di lucro né riprodotte senza autorizzazione
+- Si può chiudere con la "✕"; una volta chiusa non ricompare più su quel dispositivo/browser (salvato in localStorage), così non è invadente per chi torna spesso sul sito. La chiusura è animata.
 
 ---
 
-## 5. Bug corretti nel tempo (per riferimento)
+## 6. Bug corretti nel tempo (per riferimento)
 
 - **"2 votoi" invece di "2 voti"** — errore di pluralizzazione nel testo
 - **Click su un nome in classifica non funzionava** — le virgolette annidate nell'HTML si "rompevano" a vicenda; risolto passando a un sistema con `data-attribute` invece di stringhe incollate in un `onclick`
@@ -194,9 +251,9 @@ In parole semplici: chiunque può leggere foto/voti/anni attivi e votare o invia
 
 ---
 
-## 6. Cosa NON è stato ancora fatto (prossimi passi possibili)
+## 7. Cosa NON è stato ancora fatto (prossimi passi possibili)
 
-- ~~Filigrana sulle foto pubbliche~~ — fatto (vedi sezione sopra)
+- **Filigrana sulle foto pubbliche**: prevista ma non ancora implementata
 - **Invio email automatico**: quando verrà scelto l'indirizzo email di destinazione, si può aggiungere un `mailto:` automatico che apre il client email del visitatore con il messaggio già pronto, in aggiunta all'elenco richieste in admin (già funzionante)
 - **Sicurezza extra dell'area admin**, discussa ma non completata:
   - Bloccare le regole del database a una email specifica invece che "chiunque sia loggato"
@@ -206,8 +263,9 @@ In parole semplici: chiunque può leggere foto/voti/anni attivi e votare o invia
 
 ---
 
-## 7. Note pratiche da ricordare
+## 8. Note pratiche da ricordare
 
 - Dopo ogni modifica ai file, vanno **ricaricati manualmente su GitHub** (nessun collegamento automatico è attivo)
 - Le foto sono salvate come testo dentro al database, non come file separati: per volumi molto più grandi (migliaia di foto) andrebbe rivista l'architettura, ma per centinaia di foto per anno il sistema attuale regge bene
 - L'identificazione dei visitatori per il voto "una persona, un voto per foto" si basa sul browser (non un vero account): cancellando i dati del browser o cambiando dispositivo, per il sito è "una persona nuova"
+- **Il redesign non ha modificato nulla su Firebase**: le regole del database, l'autenticazione e la struttura dati restano identiche. Basta sostituire i file HTML/CSS/JS nel repository e fare push.

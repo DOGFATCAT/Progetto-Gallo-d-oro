@@ -4,28 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gallo d'Oro di Petriano — Foto dell'edizione</title>
-<meta name="description" content="Le foto di un'edizione del Festival Gallo d'Oro di Petriano: vota chi credi che sia nello scatto e scopri la classifica della community.">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Gallo d'Oro di Petriano — Foto dell'edizione">
-<meta property="og:description" content="Vota chi credi che sia negli scatti del Festival e scopri la classifica della community.">
-<meta property="og:image" content="https://dogfatcat.github.io/Progetto-Gallo-d-oro/og-image.png">
-<meta property="og:url" content="https://dogfatcat.github.io/Progetto-Gallo-d-oro/pagina3-foto.html">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Gallo d'Oro di Petriano — Foto dell'edizione">
-<meta name="twitter:description" content="Vota chi credi che sia negli scatti del Festival e scopri la classifica della community.">
-<meta name="twitter:image" content="https://dogfatcat.github.io/Progetto-Gallo-d-oro/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Space+Mono:wght@400;700&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-<noscript><style>body{opacity:1 !important;}</style></noscript>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<noscript><style>body{opacity:1 !important;} .reveal{opacity:1 !important;transform:none !important;}</style></noscript>
 </head>
 <body>
 <div class="app">
   <div id="nav-slot"></div>
 
-  <a class="back-link" href="pagina2-anni.html">← Torna agli anni</a>
+  <a class="back-link reveal" href="pagina2-anni.html">← Torna agli anni</a>
 
-  <div class="page-head" style="padding-top:0;">
+  <div class="page-head reveal" style="padding-top:0;">
     <div class="year-title-row">
       <h2 id="year-title">Foto</h2>
       <div id="year-nav-slot"></div>
@@ -33,11 +26,11 @@
     <p>Scrivi un nome sotto ogni foto, oppure tocca un nome già proposto in classifica per aggiungere il tuo voto. La classifica è condivisa: la vede tutta la comunità.</p>
   </div>
 
-  <div id="no-year-msg" style="display:none; color:var(--cream-dim);">
-    Nessun anno selezionato. <a href="pagina2-anni.html" style="color:var(--gold-bright);">Torna alla pagina degli anni</a> per sceglierne uno.
+  <div id="no-year-msg" style="display:none; color:var(--text-muted);">
+    Nessun anno selezionato. <a href="pagina2-anni.html" style="color:var(--gold-300);">Torna alla pagina degli anni</a> per sceglierne uno.
   </div>
 
-  <div id="loading-msg" style="color:var(--cream-dim);">Caricamento foto…</div>
+  <div id="loading-msg" style="color:var(--text-muted); margin-bottom:var(--space-6);">Caricamento foto…</div>
   <div id="demo-banner-slot"></div>
   <div class="photo-grid" id="photo-grid"></div>
   <div class="load-more-row" id="load-more-row" style="display:none;">
@@ -56,21 +49,20 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
 <script src="script.js"></script>
 <script>
-  const BATCH_SIZE = 12; // quante foto caricare per volta
-  let batchCursorKey = null; // ultima chiave caricata, per continuare da lì
+  const BATCH_SIZE = 12;
+  let batchCursorKey = null;
   let batchYear = null;
-  let batchIndex = 0; // per numerare le foto man mano che arrivano
+  let batchIndex = 0;
 
   const params = new URLSearchParams(window.location.search);
   const year = params.get('anno');
 
-  if(year) setLastYear(year); // ricorda l'anno PRIMA di disegnare il menu
+  if (year) setLastYear(year);
   mountNav('foto');
   mountCartWidget();
   mountLegalNotice();
-  mountBackToTop();
 
-  if(!year){
+  if (!year) {
     document.getElementById('no-year-msg').style.display = 'block';
     document.getElementById('loading-msg').style.display = 'none';
   } else {
@@ -80,14 +72,11 @@
   }
 
   async function renderYearNav(y){
-    // Uso solo gli anni davvero "attivi" impostati in admin; se non ne è
-    // stato impostato nessuno, ricado sull'intero intervallo demo.
     const visible = await getVisibleYears();
-    const list = (visible && visible.length > 0 ? visible : YEARS).slice().sort((a,b)=>a-b);
-
+    const list = (visible && visible.length > 0 ? visible : YEARS).slice().sort((a,b) => a - b);
     const idx = list.indexOf(y);
-    const prevYear = idx > 0 ? list[idx-1] : null;
-    const nextYear = (idx !== -1 && idx < list.length-1) ? list[idx+1] : null;
+    const prevYear = idx > 0 ? list[idx - 1] : null;
+    const nextYear = (idx !== -1 && idx < list.length - 1) ? list[idx + 1] : null;
 
     const prevHtml = prevYear !== null
       ? `<a class="year-nav-btn" href="pagina3-foto.html?anno=${prevYear}" title="Edizione ${prevYear}">← ${prevYear}</a>`
@@ -96,9 +85,7 @@
       ? `<a class="year-nav-btn" href="pagina3-foto.html?anno=${nextYear}" title="Edizione ${nextYear}">${nextYear} →</a>`
       : `<span class="year-nav-btn disabled">— →</span>`;
 
-    document.getElementById('year-nav-slot').innerHTML = `
-      <div class="year-nav">${prevHtml}${nextHtml}</div>
-    `;
+    document.getElementById('year-nav-slot').innerHTML = `<div class="year-nav">${prevHtml}${nextHtml}</div>`;
   }
 
   async function loadYearPhotos(year){
@@ -108,24 +95,22 @@
     batchYear = year;
 
     let firstSnap;
-    try{
+    try {
       firstSnap = await db.ref(`photos/${year}`).orderByKey().limitToFirst(BATCH_SIZE).once('value');
-    }catch(e){
+    } catch (e) {
       console.error('Errore caricamento foto', e);
     }
 
     loadingMsg.style.display = 'none';
-
     const firstBatch = snapshotToOrderedArray(firstSnap);
     const hasReal = firstBatch.length > 0;
 
-    if(!hasReal){
-      // Nessuna foto reale caricata per questo anno: mostro i segnaposto demo
-      bannerSlot.innerHTML = `<div class="demo-banner">Per questo anno non sono ancora state caricate foto reali: qui sotto vedi dei segnaposto demo. Caricale dalla pagina admin.</div>`;
+    if (!hasReal) {
+      bannerSlot.innerHTML = `<div class="demo-banner reveal">Per questo anno non sono ancora state caricate foto reali: qui sotto vedi dei segnaposto demo. Caricale dalla pagina admin.</div>`;
       const count = photoCountFor(year);
       let cardsHtml = '';
       const ids = [];
-      for(let i=1;i<=count;i++){
+      for (let i = 1; i <= count; i++) {
         const photoId = `p${i}`;
         cardsHtml += photoCardHtml(year, photoId, i, `<div class="photo-placeholder">${cameraIcon()}</div>`, 'foto segnaposto — carica lo scatto reale');
         ids.push(photoId);
@@ -142,7 +127,7 @@
 
   function snapshotToOrderedArray(snap){
     const arr = [];
-    if(snap) snap.forEach(child => { arr.push([child.key, child.val()]); });
+    if (snap) snap.forEach(child => { arr.push([child.key, child.val()]); });
     return arr;
   }
 
@@ -154,7 +139,7 @@
       const { data, voting, caption } = normalizePhotoValue(rawVal);
       batchIndex++;
       cardsHtml += photoCardHtml(batchYear, photoId, batchIndex, `<img src="${data}" alt="Foto ${batchIndex} del ${batchYear}" loading="lazy" decoding="async">`, 'clicca per ingrandire', voting, caption);
-      if(voting) votingIds.push(photoId);
+      if (voting) votingIds.push(photoId);
     });
     grid.insertAdjacentHTML('beforeend', cardsHtml);
     votingIds.forEach(id => attachRankListener(batchYear, id));
@@ -165,8 +150,8 @@
   function updateLoadMoreButton(lastBatchLength){
     const row = document.getElementById('load-more-row');
     const btn = document.getElementById('load-more-btn');
-    if(lastBatchLength === BATCH_SIZE){
-      row.style.display = 'block';
+    if (lastBatchLength === BATCH_SIZE) {
+      row.style.display = 'flex';
       btn.disabled = false;
       btn.textContent = 'Carica altre foto';
     } else {
@@ -179,17 +164,17 @@
     btn.disabled = true;
     btn.textContent = 'Caricamento…';
     let snap;
-    try{
+    try {
       snap = await db.ref(`photos/${batchYear}`)
         .orderByKey()
         .startAfter(batchCursorKey)
         .limitToFirst(BATCH_SIZE)
         .once('value');
-    }catch(e){
+    } catch (e) {
       console.error('Errore caricamento altre foto', e);
     }
     const batch = snapshotToOrderedArray(snap);
-    if(batch.length === 0){
+    if (batch.length === 0) {
       document.getElementById('load-more-row').style.display = 'none';
       return;
     }

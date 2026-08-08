@@ -4,39 +4,34 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gallo d'Oro di Petriano — Scegli l'edizione</title>
-<meta name="description" content="Scegli l'edizione del Festival Gallo d'Oro di Petriano da sfogliare, dal 1966 ad oggi.">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Gallo d'Oro di Petriano — Scegli l'edizione">
-<meta property="og:description" content="Sfoglia le edizioni del Festival Gallo d'Oro di Petriano, dal 1966 ad oggi.">
-<meta property="og:image" content="https://dogfatcat.github.io/Progetto-Gallo-d-oro/og-image.png">
-<meta property="og:url" content="https://dogfatcat.github.io/Progetto-Gallo-d-oro/pagina2-anni.html">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Gallo d'Oro di Petriano — Scegli l'edizione">
-<meta name="twitter:description" content="Sfoglia le edizioni del Festival Gallo d'Oro di Petriano, dal 1966 ad oggi.">
-<meta name="twitter:image" content="https://dogfatcat.github.io/Progetto-Gallo-d-oro/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Space+Mono:wght@400;700&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-<noscript><style>body{opacity:1 !important;}</style></noscript>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<noscript><style>body{opacity:1 !important;} .reveal{opacity:1 !important;transform:none !important;}</style></noscript>
 </head>
 <body>
 <div class="app">
   <div id="nav-slot"></div>
 
-  <div class="page-head">
+  <div class="page-head reveal">
     <h2>Scegli l'edizione</h2>
     <p>Ogni biglietto è un'annata del Festival. Selezionane una per rivedere le foto e aiutarci a riconoscere chi c'è nello scatto.</p>
   </div>
 
-  <div class="search-row">
-    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-    <input id="year-search" type="text" inputmode="numeric" placeholder="Cerca un anno, es. 1998" oninput="filterYears(this.value)">
-    <button id="search-clear-btn" class="search-clear" style="display:none;" onclick="clearYearSearch()" aria-label="Cancella ricerca">✕</button>
+  <div class="search-wrap reveal">
+    <div class="search-row">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="year-search" type="text" inputmode="numeric" placeholder="Cerca un anno, es. 1998" oninput="filterYears(this.value)">
+      <button id="search-clear-btn" class="search-clear" style="display:none;" onclick="clearYearSearch()" aria-label="Cancella ricerca">✕</button>
+    </div>
   </div>
 
   <div id="demo-banner-slot"></div>
 
-  <div class="ticket-grid" id="ticket-grid"></div>
+  <div class="year-grid" id="year-grid"></div>
   <p class="rank-empty" id="no-results" style="display:none; padding:20px 0;"></p>
 
   <footer>Festival Gallo d'Oro · Gallo di Petriano (PU) · dal 1966</footer>
@@ -49,44 +44,43 @@
   mountNav('anni');
   mountCartWidget();
   mountLegalNotice();
-  mountBackToTop();
 
-  const grid = document.getElementById('ticket-grid');
+  const grid = document.getElementById('year-grid');
   const bannerSlot = document.getElementById('demo-banner-slot');
 
   (async function initYears(){
-    const visibleYears = await getVisibleYears(); // null se l'admin non ha ancora impostato nulla
+    const visibleYears = await getVisibleYears();
     const yearsToShow = visibleYears || YEARS;
 
-    if(!visibleYears){
-      bannerSlot.innerHTML = `<div class="demo-banner"><b>Nota:</b> non hai ancora impostato quali edizioni esistono davvero, quindi qui sotto vedi tutti gli anni dal 1966 al 2026 come demo. Vai nella pagina admin per selezionare solo gli anni in cui il Festival si è davvero svolto.</div>`;
+    if (!visibleYears) {
+      bannerSlot.innerHTML = `<div class="demo-banner reveal"><b>Nota:</b> non hai ancora impostato quali edizioni esistono davvero, quindi qui sotto vedi tutti gli anni dal 1966 al 2026 come demo. Vai nella pagina admin per selezionare solo gli anni in cui il Festival si è davvero svolto.</div>`;
     }
 
     grid.innerHTML = yearsToShow.map((y, i) => `
-      <a class="ticket reveal" data-year="${y}" href="pagina3-foto.html?anno=${y}" style="transition-delay:${(i % 10) * 45}ms;">
-        <span class="tk-shine" aria-hidden="true"></span>
-        <div class="tk-eyebrow">Ingresso · Piazza Cavour</div>
-        <div class="tk-year">${y}</div>
-        <div class="tk-sub">EDIZIONE · ${y} · GALLO DI PETRIANO</div>
+      <a class="year-card reveal" data-year="${y}" href="pagina3-foto.html?anno=${y}" style="transition-delay:${(i % 10) * 45}ms;">
+        <span class="yc-shine" aria-hidden="true"></span>
+        <div class="yc-eyebrow">Ingresso · Piazza Cavour</div>
+        <div class="yc-year">${y}</div>
+        <div class="yc-sub">EDIZIONE · ${y} · GALLO DI PETRIANO</div>
       </a>
     `).join('');
+
     initScrollReveal();
+    initYearCardTilt();
   })();
 
   function filterYears(query){
     const q = query.trim();
     document.getElementById('search-clear-btn').style.display = q ? 'inline-block' : 'none';
-
-    const tickets = grid.querySelectorAll('.ticket');
+    const cards = grid.querySelectorAll('.year-card');
     let visibleCount = 0;
-    tickets.forEach(t => {
+    cards.forEach(t => {
       const match = !q || t.dataset.year.includes(q);
       t.style.display = match ? '' : 'none';
-      if(match) visibleCount++;
+      if (match) visibleCount++;
     });
-
     const noResults = document.getElementById('no-results');
-    if(visibleCount === 0 && q){
+    if (visibleCount === 0 && q) {
       noResults.textContent = `Nessuna edizione trovata per "${q}".`;
       noResults.style.display = 'block';
     } else {
