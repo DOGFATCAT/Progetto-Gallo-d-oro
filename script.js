@@ -308,9 +308,9 @@ window.__vote = function(ev, year, photoId){
 // - una stringa (formato vecchio: solo l'immagine, voto sempre attivo)
 // - un oggetto { data, voting, caption } (formato nuovo)
 function normalizePhotoValue(val){
-  if(typeof val === 'string') return { data: val, voting: true, caption: '' };
-  if(val && typeof val === 'object') return { data: val.data, voting: val.voting !== false, caption: val.caption || '' };
-  return { data: null, voting: true, caption: '' };
+  if(typeof val === 'string') return { data: val, voting: true, caption: '', number: '' };
+  if(val && typeof val === 'object') return { data: val.data, voting: val.voting !== false, caption: val.caption || '', number: val.number || '' };
+  return { data: null, voting: true, caption: '', number: '' };
 }
 
 function photoCardHtml(year, photoId, label, mediaHtml, hintCaption, votingEnabled, manualCaption){
@@ -576,11 +576,12 @@ async function renderCartItems(){
     const el = document.getElementById(`cart-item-${i}`);
     try{
       const snap = await db.ref(`photos/${it.year}/${it.photoId}`).once('value');
-      const { data } = normalizePhotoValue(snap.val());
+      const { data, number } = normalizePhotoValue(snap.val());
+      cart[i].number = number || ''; // riuso questo dato quando preparo l'email
       if(el && data){
         el.innerHTML = `
           <img src="${data}" alt="Foto ${it.year}">
-          <span>Anno ${it.year}</span>
+          <span>Anno ${it.year}${number ? ' · foto #' + escapeHtml(number) : ''}</span>
           <button class="cart-remove" onclick="removeCartItem(${i})" aria-label="Rimuovi">✕</button>
         `;
       } else if(el){
@@ -590,6 +591,7 @@ async function renderCartItems(){
       if(el) el.innerHTML = `<span>Errore caricamento</span><button class="cart-remove" onclick="removeCartItem(${i})">✕</button>`;
     }
   }
+  lastRenderedCartDetails = cart;
 }
 
 window.removeCartItem = function(index){
@@ -598,6 +600,10 @@ window.removeCartItem = function(index){
   setCart(cart);
   renderCartItems();
 };
+
+// Email a cui arrivano le richieste (usata anche per il mailto automatico)
+const REQUEST_DESTINATION_EMAIL = 'fotogallodoro@gmail.com';
+let lastRenderedCartDetails = [];
 
 window.submitCartRequest = async function(){
   const name = document.getElementById('cart-name').value.trim();
@@ -620,13 +626,33 @@ window.submitCartRequest = async function(){
       timestamp: Date.now(),
       status: 'pending'
     });
+
+    // Apro anche il client email del visitatore, con un messaggio già pronto
+    // verso l'admin — in aggiunta al salvataggio (che resta comunque visibile
+    // nel pannello "Richieste" anche se l'email non dovesse partire).
+    try{
+      const detailsSource = (lastRenderedCartDetails.length === cart.length) ? lastRenderedCartDetails : cart;
+      const elenco = detailsSource.map(it => `- Anno ${it.year}${it.number ? ' · foto #' + it.number : ' (id: ' + it.photoId + ')'}`).join('\n');
+      const subject = `Richiesta foto Gallo d'Oro — ${name || email}`;
+      const body =
+        `Nome: ${name || '(non indicato)'}\n` +
+        `Email: ${email}\n` +
+        (note ? `Nota: ${note}\n` : '') +
+        `\nFoto richieste:\n${elenco}`;
+      const mailtoUrl = `mailto:${REQUEST_DESTINATION_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.location.href = mailtoUrl;
+    }catch(e){
+      console.error('Errore apertura client email', e);
+      // Non blocco il flusso: la richiesta è comunque salvata correttamente
+    }
+
     setCart([]);
-    statusEl.textContent = '✅ Richiesta inviata! Ti risponderemo via email appena possibile.';
+    statusEl.textContent = '✅ Richiesta salvata! Si sta aprendo il tuo programma di posta per inviarcela anche via email.';
     document.getElementById('cart-items').innerHTML = '';
     document.getElementById('cart-name').value = '';
     document.getElementById('cart-email').value = '';
     document.getElementById('cart-note').value = '';
-    setTimeout(() => window.closeCartModal(), 2400);
+    setTimeout(() => window.closeCartModal(), 3200);
   }catch(e){
     console.error('Errore invio richiesta', e);
     statusEl.textContent = 'Errore durante l\'invio, riprova.';

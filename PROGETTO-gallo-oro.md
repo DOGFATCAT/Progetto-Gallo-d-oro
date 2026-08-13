@@ -2,7 +2,7 @@
 
 Documento di riepilogo di tutto ciò che è stato costruito finora, per tenere traccia dello stato del sito, delle scelte fatte e di cosa resta da fare.
 
-**Ultimo aggiornamento:** 30 luglio 2026 (filigrana, torna su, sicurezza inattività, anteprima social)
+**Ultimo aggiornamento:** 30 luglio 2026 (regole bloccate all'email admin + mailto automatico carrello)
 **Repository:** https://github.com/DOGFATCAT/Progetto-Gallo-d-oro
 **Sito online:** https://dogfatcat.github.io/Progetto-Gallo-d-oro/index.html
 
@@ -78,7 +78,7 @@ requests/
   "rules": {
     "votes": {
       ".read": true,
-      ".write": "auth != null",
+      ".write": "auth != null && auth.token.email == 'fotogallodoro@gmail.com'",
       "$year": {
         "$photoId": {
           "voters": {
@@ -92,14 +92,14 @@ requests/
     },
     "photos": {
       ".read": true,
-      ".write": "auth != null"
+      ".write": "auth != null && auth.token.email == 'fotogallodoro@gmail.com'"
     },
     "meta": {
       ".read": true,
-      ".write": "auth != null"
+      ".write": "auth != null && auth.token.email == 'fotogallodoro@gmail.com'"
     },
     "requests": {
-      ".read": "auth != null",
+      ".read": "auth != null && auth.token.email == 'fotogallodoro@gmail.com'",
       ".write": true
     },
     "$other": {
@@ -110,7 +110,7 @@ requests/
 }
 ```
 
-In parole semplici: chiunque può leggere foto/voti/anni attivi e votare o inviare una richiesta, ma solo chi ha fatto login da admin può caricare foto, gestire gli anni attivi, o leggere le richieste ricevute.
+In parole semplici: chiunque può leggere foto/voti/anni attivi e votare o inviare una richiesta, ma solo l'account con l'email `fotogallodoro@gmail.com` può caricare foto, gestire gli anni attivi, o leggere le richieste ricevute — anche se in futuro venisse creato per sbaglio un altro utente Firebase, non potrebbe scrivere nulla.
 
 ---
 
@@ -137,7 +137,7 @@ In parole semplici: chiunque può leggere foto/voti/anni attivi e votare o invia
 - **Caricamento a blocchi**: le foto si caricano 12 alla volta con un pulsante "Carica altre foto", pensato per reggere bene anche 100-150+ foto per anno senza rallentare l'apertura della pagina
 - **Foto di gruppo**: l'admin può disattivare il gioco "chi è" su singole foto (utile per foto con tante persone insieme)
 - **Didascalia manuale**: quando il gioco è disattivato (o anche quando è attivo, come nota), l'admin può scrivere a mano chi si vede nella foto
-- **Carrello foto**: pulsante "Aggiungi al carrello" su ogni foto reale; un'iconcina fissa in basso a destra mostra quante foto sono state scelte; si apre un pannello con l'elenco (anche di anni diversi), si inseriscono nome/email/nota e si invia un'unica richiesta
+- **Carrello foto**: pulsante "Aggiungi al carrello" su ogni foto reale; un'iconcina fissa in basso a destra mostra quante foto sono state scelte; si apre un pannello con l'elenco (anche di anni diversi), si inseriscono nome/email/nota e si invia un'unica richiesta — salvata in admin **e** apre automaticamente il programma di posta del visitatore con un'email già pronta verso `fotogallodoro@gmail.com`, come doppia sicurezza
 
 ### Area Admin (`admin.html`)
 - Login protetto con email e password (Firebase Authentication — nessuna registrazione pubblica, l'utente va creato a mano dalla console Firebase)
@@ -152,7 +152,7 @@ In parole semplici: chiunque può leggere foto/voti/anni attivi e votare o invia
 - **Pulsante "torna su"**: compare in basso a sinistra dopo aver scorso un po' la pagina, riporta in cima con un click
 - **Disconnessione automatica admin**: se non c'è nessuna interazione per 15 minuti mentre sei loggato, esci automaticamente per sicurezza
 - **Anteprima social**: generata un'immagine di copertina (`og-image.png`) e aggiunti i meta tag Open Graph/Twitter a tutte e 3 le pagine, così condividendo il link su WhatsApp/Facebook compare un'anteprima curata invece di un link nudo
-- **Ancora da fare**: bloccare le regole del database a una sola email admin, e collegare l'invio email automatico delle richieste del carrello — in attesa che l'admin comunichi l'indirizzo email da usare
+- **Ancora da fare**: nessuno — email admin impostata (`fotogallodoro@gmail.com`), regole bloccate a quella email, mailto automatico collegato
 
 ### Palette colori e login admin
 - Applicata la palette **"Blu Adriatico"**: blu petrolio profondo (`#0f2430`) con accenti oro sabbia (`#d7a45c`) e corallo/terracotta (`#d1614a`), al posto della precedente palette navy/cremisi. Cambiata una sola volta nelle variabili condivise di colore, si è propagata automaticamente a tutto il sito (nav, pulsanti, biglietti, foto, badge classifica, banner) grazie all'uso coerente delle variabili CSS
