@@ -334,7 +334,7 @@ function photoCardHtml(year, photoId, label, mediaHtml, hintCaption, votingEnabl
   if(!votingEnabled){
     const captionBlock = manualCaption
       ? `<p class="manual-caption"><b>Chi si vede:</b> ${escapeHtml(manualCaption)}</p>`
-      : `<p class="mine-note">📷 Foto di gruppo — il gioco "chi è" non è attivo qui.</p>`;
+      : `<p class="mine-note">Didascalia non disponibile.</p>`;
     return `
       <div class="photo-card reveal" style="transition-delay:${staggerDelay}ms;">
         <div class="photo-id">Scatto ${label} · ${year}</div>
