@@ -5,36 +5,36 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gallo d'Oro — Area riservata</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Space+Mono:wght@400;700&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --night:#0f2430; --night-deep:#081720;
-    --gold:#d7a45c; --gold-bright:#eac088;
-    --crimson:#d1614a; --crimson-bright:#e2806a;
-    --cream:#f5ede0; --cream-dim:#ebe0cd;
-    --ink:#152530; --ink-soft:#42565e;
-    --line: rgba(215,164,92,0.28);
+    --night:#0a0f1e; --night-deep:#05070d;
+    --gold:#ffb020; --gold-bright:#ffd166;
+    --crimson:#ff5c5c; --crimson-bright:#ff7a7a;
+    --cream:#ffffff; --cream-dim:#e7e9f0;
+    --ink:#12141c; --ink-soft:#565a68;
+    --line: rgba(255,176,32,0.32);
   }
   *{box-sizing:border-box;}
   body{
     margin:0; min-height:100vh;
     background:
-      radial-gradient(ellipse at 20% -10%, rgba(217,164,65,0.11), transparent 45%),
-      radial-gradient(ellipse at 90% 0%, rgba(178,58,47,0.11), transparent 42%),
+      radial-gradient(ellipse at 20% -10%, rgba(255,176,32,0.11), transparent 45%),
+      radial-gradient(ellipse at 90% 0%, rgba(255,92,92,0.11), transparent 42%),
       radial-gradient(ellipse at center, var(--night) 0%, var(--night-deep) 130%);
     color:var(--cream);
-    font-family:'Nunito Sans', sans-serif;
+    font-family:'Inter', sans-serif;
   }
   .wrap{max-width:900px; margin:0 auto; padding:40px 20px 60px;}
   h1{
-    font-family:'Playfair Display', serif; font-weight:900;
+    font-family:'Space Grotesk', sans-serif; font-weight:800;
     font-size:1.8rem; margin:0 0 6px; color:var(--gold-bright);
   }
   .sub{color:var(--cream-dim); margin:0 0 30px; font-size:0.95rem;}
 
   /* login */
   .login-card{
-    background:linear-gradient(180deg, #faf3e4, var(--cream)); color:var(--ink);
+    background:var(--cream); color:var(--ink);
     border-radius:12px; padding:34px; max-width:380px;
     box-shadow:0 24px 60px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.5) inset;
   }
@@ -50,12 +50,12 @@
   .login-brand{ text-align:center; }
   .login-cresta{ font-size:2.6rem; display:block; margin-bottom:6px; }
   .login-brand h1{
-    font-family:'Playfair Display', serif; font-weight:900;
+    font-family:'Space Grotesk', sans-serif; font-weight:800;
     font-size:2rem; margin:0 0 8px; color:var(--gold-bright);
   }
   .login-brand p{ color:var(--cream-dim); font-size:0.92rem; margin:0; max-width:320px; }
   .login-card{
-    background:linear-gradient(180deg, #faf3e4, var(--cream)); color:var(--ink);
+    background:var(--cream); color:var(--ink);
     border-radius:14px; padding:34px; max-width:380px; width:100%;
     box-shadow:0 24px 60px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.5) inset;
   }
@@ -72,7 +72,7 @@
   }
   .toggle-pw:hover{background:rgba(28,23,16,0.1);}
   .admin-title{
-    font-family:'Playfair Display', serif; font-weight:900;
+    font-family:'Space Grotesk', sans-serif; font-weight:800;
     font-size:1.4rem; margin:0 0 4px; color:var(--gold-bright);
   }
   .login-card label{
@@ -86,16 +86,16 @@
   }
   .login-card input:focus{outline:none; border-color:var(--crimson);}
   .btn{
-    font-family:'Nunito Sans',sans-serif; font-weight:800; font-size:0.9rem;
-    padding:12px 22px; border-radius:999px; border:none; cursor:pointer;
-    transition:transform .15s ease, box-shadow .15s ease;
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:0.9rem;
+    padding:13px 24px; border-radius:12px; border:none; cursor:pointer;
+    transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease;
   }
-  .btn:hover{transform:translateY(-2px);}
-  .btn-primary{background:linear-gradient(155deg, var(--crimson-bright), var(--crimson) 65%); color:var(--cream); box-shadow:0 6px 18px rgba(178,58,47,0.3);}
-  .btn-primary:hover{box-shadow:0 10px 26px rgba(178,58,47,0.42);}
-  .btn-gold{background:linear-gradient(155deg, var(--gold-bright), var(--gold) 65%); color:var(--night-deep); box-shadow:0 6px 18px rgba(217,164,65,0.3);}
+  .btn:hover{transform:translateY(-3px) scale(1.02);}
+  .btn-primary{background:linear-gradient(155deg, var(--crimson-bright), var(--crimson) 65%); color:var(--cream); box-shadow:0 6px 18px rgba(255,92,92,0.3);}
+  .btn-primary:hover{box-shadow:0 10px 26px rgba(255,92,92,0.42);}
+  .btn-gold{background:linear-gradient(155deg, var(--gold-bright), var(--gold) 65%); color:var(--night-deep); box-shadow:0 6px 18px rgba(255,176,32,0.3);}
   .btn-ghost{background:transparent; color:var(--gold-bright); border:1px solid var(--gold);}
-  .btn-ghost:hover{background:rgba(217,164,65,0.08);}
+  .btn-ghost:hover{background:rgba(255,176,32,0.08);}
   .login-card .btn{width:100%; margin-top:20px;}
   .error{color:var(--crimson); font-size:0.85rem; margin-top:12px; min-height:1.2em;}
 
@@ -108,12 +108,12 @@
   .who{font-size:0.85rem; color:var(--cream-dim);}
 
   .panel{
-    background:rgba(246,236,217,0.035);
+    background:rgba(255,255,255,0.035);
     border:1px solid var(--line);
-    border-radius:12px;
+    border-radius:18px;
     padding:24px;
     margin-bottom:26px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.18);
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
   }
   .panel h2::before{
     content:'';
@@ -121,7 +121,7 @@
     width:3px; border-radius:2px;
     background:linear-gradient(180deg, var(--gold-bright), var(--crimson));
   }
-  .panel h2{font-family:'Playfair Display', serif; font-size:1.3rem; margin:0 0 14px; color:var(--cream); position:relative; padding-left:16px;}
+  .panel h2{font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:1.35rem; margin:0 0 14px; color:var(--cream); position:relative; padding-left:16px;}
   select{
     background:var(--cream); color:var(--ink);
     border:none; border-radius:6px; padding:10px 14px;
@@ -137,18 +137,18 @@
   }
   .year-toggle{
     display:flex; align-items:center; gap:8px;
-    background:rgba(246,236,217,0.04);
+    background:rgba(255,255,255,0.04);
     border:1px solid var(--line);
     border-radius:6px;
     padding:8px 10px;
-    font-family:'Space Mono', monospace;
+    font-family:'Space Grotesk', sans-serif;
     font-size:0.82rem;
     cursor:pointer;
     transition:border-color .15s ease, background .15s ease;
   }
   .year-toggle:hover{border-color:var(--gold);}
   .year-toggle.active{
-    background:rgba(217,164,65,0.14);
+    background:rgba(255,176,32,0.14);
     border-color:var(--gold);
     color:var(--gold-bright);
     font-weight:700;
@@ -160,7 +160,7 @@
     gap:8px;
     margin-top:14px;
     padding:10px 14px;
-    background:rgba(217,164,65,0.07);
+    background:rgba(255,176,32,0.07);
     border:1px solid var(--line);
     border-radius:8px;
     font-size:0.85rem;
@@ -178,7 +178,7 @@
     cursor:pointer;
     transition:background .15s ease;
   }
-  .drop.dragover{background:rgba(217,164,65,0.08);}
+  .drop.dragover{background:rgba(255,176,32,0.08);}
   .drop input{display:none;}
 
   .grid{
@@ -191,7 +191,7 @@
   }
   .thumb img{width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:2px; display:block;}
   .thumb .cap{
-    font-family:'Space Mono', monospace; font-size:0.68rem; color:var(--ink-soft);
+    font-family:'Space Grotesk', sans-serif; font-size:0.68rem; color:var(--ink-soft);
     padding:6px 2px 8px; display:flex; justify-content:space-between; align-items:center;
   }
   .thumb .del{
@@ -206,14 +206,14 @@
     border:1px solid rgba(28,23,16,0.15);
     border-radius:4px;
     padding:6px 8px;
-    font-family:'Space Mono', monospace;
+    font-family:'Space Grotesk', sans-serif;
     font-size:0.68rem;
     font-weight:700;
     cursor:pointer;
     transition:background .15s ease, border-color .15s ease;
   }
   .vote-toggle.on{
-    background:rgba(217,164,65,0.15);
+    background:rgba(255,176,32,0.15);
     color:var(--ink);
     border-color:var(--gold);
   }
@@ -225,7 +225,7 @@
   .number-label{
     display:block;
     margin-top:8px;
-    font-family:'Nunito Sans', sans-serif;
+    font-family:'Inter', sans-serif;
     font-size:0.68rem;
     font-weight:700;
     text-transform:uppercase;
@@ -243,7 +243,7 @@
     border:1px solid rgba(28,23,16,0.15);
     border-radius:4px;
     padding:6px 8px;
-    font-family:'Space Mono', monospace;
+    font-family:'Space Grotesk', sans-serif;
     font-size:0.8rem;
     color:var(--ink);
     background:rgba(255,255,255,0.7);
@@ -266,7 +266,7 @@
     border:1px solid rgba(28,23,16,0.15);
     border-radius:4px;
     padding:8px;
-    font-family:'Nunito Sans', sans-serif;
+    font-family:'Inter', sans-serif;
     font-size:0.78rem;
     color:var(--ink);
     background:rgba(255,255,255,0.6);
@@ -282,7 +282,7 @@
     border:none;
     border-radius:4px;
     padding:7px 8px;
-    font-family:'Nunito Sans', sans-serif;
+    font-family:'Inter', sans-serif;
     font-size:0.72rem;
     font-weight:700;
     cursor:pointer;
@@ -292,14 +292,14 @@
   .save-caption-btn:disabled{opacity:0.7; cursor:wait;}
   .uploading{
     display:flex; align-items:center; justify-content:center;
-    aspect-ratio:4/3; background:rgba(217,164,65,0.08);
+    aspect-ratio:4/3; background:rgba(255,176,32,0.08);
     border-radius:6px; font-size:0.75rem; color:var(--gold-bright);
   }
   .status{margin-top:14px; font-size:0.85rem; color:var(--gold-bright); min-height:1.2em;}
   .hidden{display:none !important;}
 
   .request-card{
-    background:rgba(246,236,217,0.04);
+    background:rgba(255,255,255,0.04);
     border:1px solid var(--line);
     border-radius:8px;
     padding:16px;
@@ -313,7 +313,7 @@
     margin-bottom:8px;
   }
   .request-head a{color:var(--gold-bright);}
-  .request-date{font-family:'Space Mono', monospace; font-size:0.72rem; color:var(--cream-dim);}
+  .request-date{font-family:'Space Grotesk', sans-serif; font-size:0.72rem; color:var(--cream-dim);}
   .request-note{
     font-size:0.85rem; color:var(--cream-dim); font-style:italic;
     margin:0 0 12px;
@@ -325,7 +325,7 @@
   }
   .request-thumb{
     display:flex; flex-direction:column; align-items:center; gap:2px;
-    font-family:'Space Mono', monospace; font-size:0.68rem; color:var(--cream-dim);
+    font-family:'Space Grotesk', sans-serif; font-size:0.68rem; color:var(--cream-dim);
   }
   .request-thumb-id{
     color:var(--gold);
@@ -886,7 +886,7 @@
     ctx.fillStyle = '#ffffff';
     ctx.strokeStyle = '#000000';
     ctx.lineWidth = Math.max(1, fontSize * 0.06);
-    ctx.font = `bold ${fontSize}px 'Nunito Sans', Arial, sans-serif`;
+    ctx.font = `bold ${fontSize}px 'Inter', Arial, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.translate(w / 2, h / 2);

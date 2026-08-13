@@ -2,7 +2,7 @@
 
 Documento di riepilogo di tutto ciò che è stato costruito finora, per tenere traccia dello stato del sito, delle scelte fatte e di cosa resta da fare.
 
-**Ultimo aggiornamento:** 30 luglio 2026 (messaggio didascalia mancante semplificato)
+**Ultimo aggiornamento:** 30 luglio 2026 (grafica rifatta da zero: bold, font moderni, ticker animato)
 **Repository:** https://github.com/DOGFATCAT/Progetto-Gallo-d-oro
 **Sito online:** https://dogfatcat.github.io/Progetto-Gallo-d-oro/index.html
 
@@ -153,6 +153,16 @@ In parole semplici: chiunque può leggere foto/voti/anni attivi e votare o invia
 - **Disconnessione automatica admin**: se non c'è nessuna interazione per 15 minuti mentre sei loggato, esci automaticamente per sicurezza
 - **Anteprima social**: generata un'immagine di copertina (`og-image.png`) e aggiunti i meta tag Open Graph/Twitter a tutte e 3 le pagine, così condividendo il link su WhatsApp/Facebook compare un'anteprima curata invece di un link nudo
 - **Ancora da fare**: nessuno — email admin impostata (`fotogallodoro@gmail.com`), regole bloccate a quella email, mailto automatico collegato
+
+### Grafica rifatta da zero (dopo feedback: troppo vecchia/vintage/immobile)
+- **Motivo**: la direzione precedente (font serif Playfair Display, card stile biglietto/polaroid, colori tenui) è stata giudicata "vecchia" e "immobile" nonostante le rifiniture — serviva un cambio di direzione vero, non solo un aggiustamento
+- **Font**: sostituiti Playfair Display (serif) e Space Mono (monospace) con **Space Grotesk** (titoli, grassetto/bold) e **Inter** (testo) — coppia tipografica moderna
+- **Colori**: palette resa molto più accesa e satura (oro `#ffb020`, corallo `#ff5c5c`, teal `#00e0c6` come accento), su sfondo scuro con un **gradiente di sfondo animato** che si muove lentamente da solo, per dare movimento anche senza interazione
+- **Titolo hero**: enorme, con effetto testo sfumato (gradiente oro→corallo applicato al testo)
+- **Rimossi gli elementi "vintage"**: niente più biglietti con i fori da strappo, niente più foto in stile polaroid inclinata su carta color antico — ora card piatte, bianche, moderne, con un bordo colorato bold in alto
+- **Le vecchie luci statiche (SVG con pallini fermi)** sono state sostituite da un **ticker/striscia animata** che scorre in continuazione col nome del festival — risolve il problema "immobile" in modo diretto e sempre visibile
+- **Animazioni più marcate**: comparsa degli elementi con movimento più ampio e uno scatto elastico (invece di una dissolvenza sottile), pulsanti con rimbalzo più pronunciato al passaggio del mouse
+- **Pagina admin** allineata alla stessa nuova estetica (stessi font, stessa palette, stessi raggi/ombre)
 
 ### Palette colori e login admin
 - Applicata la palette **"Blu Adriatico"**: blu petrolio profondo (`#0f2430`) con accenti oro sabbia (`#d7a45c`) e corallo/terracotta (`#d1614a`), al posto della precedente palette navy/cremisi. Cambiata una sola volta nelle variabili condivise di colore, si è propagata automaticamente a tutto il sito (nav, pulsanti, biglietti, foto, badge classifica, banner) grazie all'uso coerente delle variabili CSS

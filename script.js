@@ -95,19 +95,10 @@ function cameraIcon(){
 }
 
 function lightsSvg(){
-  let bulbs = '';
-  for(let i=0;i<18;i++){
-    const x = 10 + i*54;
-    const colors = ['#d9a441','#b23a2f','#f0c869'];
-    const c = colors[i % colors.length];
-    const delay = (i * 0.22).toFixed(2);
-    const duration = (2 + (i % 4) * 0.35).toFixed(2);
-    bulbs += `<circle class="bulb" cx="${x}" cy="18" r="4.2" fill="${c}" style="animation-delay:${delay}s; animation-duration:${duration}s;"/>`;
-  }
-  return `<svg viewBox="0 0 980 34" preserveAspectRatio="none">
-    <path d="M0,4 Q245,26 490,4 T980,4" stroke="rgba(217,164,65,0.35)" stroke-width="1.5" fill="none"/>
-    ${bulbs}
-  </svg>`;
+  const item = `<span class="ticker-item">🐓 GALLO D'ORO DI PETRIANO</span><span class="ticker-sep">✦</span>`;
+  const set = item.repeat(8);
+  // Il contenuto è duplicato due volte: con translateX(-50%) il loop risulta perfettamente continuo
+  return `<div class="ticker-track">${set}${set}</div>`;
 }
 
 // ---------------- BARRA DI NAVIGAZIONE (uguale su tutte le pagine) ----------------
