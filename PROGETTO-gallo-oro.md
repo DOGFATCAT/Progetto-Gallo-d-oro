@@ -2,7 +2,7 @@
 
 Documento di riepilogo di tutto ciò che è stato costruito finora, per tenere traccia dello stato del sito, delle scelte fatte e di cosa resta da fare.
 
-**Ultimo aggiornamento:** 30 luglio 2026 (regole bloccate all'email admin + mailto automatico carrello)
+**Ultimo aggiornamento:** 30 luglio 2026 (filigrana resa visibile su foto chiare e scure)
 **Repository:** https://github.com/DOGFATCAT/Progetto-Gallo-d-oro
 **Sito online:** https://dogfatcat.github.io/Progetto-Gallo-d-oro/index.html
 
@@ -190,6 +190,7 @@ In parole semplici: chiunque può leggere foto/voti/anni attivi e votare o invia
 - **Foto bloccate su "Caricamento foto..."** — `ReferenceError` per una variabile (`batchYear`) usata prima di essere dichiarata nel codice; risolto riordinando le dichiarazioni
 - **Frecce anno precedente/successivo** portavano anche su anni non attivi — corretto per usare la lista di anni attivi invece di un semplice anno−1/anno+1
 - **Layout del form nel carrello disordinato** (etichette ed campi disallineati) — mancava un `width:100%` esplicito sui campi; ogni campo è stato raggruppato in un blocco proprio per un layout più solido
+- **Filigrana quasi invisibile su foto chiare** — era scritta solo in bianco trasparente, poco leggibile su foto dai toni chiari/pastello; ora ha anche un contorno scuro, così resta visibile sia su foto chiare che scure
 - **Eliminare una foto in admin non aggiornava subito la schermata** — le regole del database non permettevano all'admin di cancellare anche i voti collegati alla foto; l'operazione falliva silenziosamente e bloccava l'aggiornamento della lista. Corrette le regole (aggiunto `.write: auth != null` sul nodo `votes`) e reso il codice più robusto (la lista si aggiorna comunque, anche se la pulizia dei voti fallisse)
 
 ---

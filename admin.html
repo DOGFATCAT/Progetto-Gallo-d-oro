@@ -882,8 +882,10 @@
     const text = "GALLO D'ORO DI PETRIANO";
     const fontSize = Math.max(14, Math.round(w * 0.04));
     ctx.save();
-    ctx.globalAlpha = 0.16;
+    ctx.globalAlpha = 0.32;
     ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = Math.max(1, fontSize * 0.06);
     ctx.font = `bold ${fontSize}px 'Nunito Sans', Arial, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -892,7 +894,8 @@
     const spacing = fontSize * 3.2;
     const span = Math.max(w, h) * 1.5;
     for(let y = -span; y <= span; y += spacing){
-      ctx.fillText(text, 0, y);
+      ctx.strokeText(text, 0, y); // contorno scuro: visibile anche su foto chiare
+      ctx.fillText(text, 0, y);   // riempimento chiaro: visibile anche su foto scure
     }
     ctx.restore();
   }
