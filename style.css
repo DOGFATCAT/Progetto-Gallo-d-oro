@@ -540,6 +540,18 @@ h1.title span{
   margin-top:36px;
 }
 
+.photo-legal-tag{
+  font-size:0.72rem;
+  font-weight:600;
+  color:var(--crimson-bright);
+  background:rgba(255,92,92,0.1);
+  border:1px solid rgba(255,92,92,0.3);
+  border-radius:8px;
+  padding:6px 10px;
+  margin:0 0 12px;
+  text-align:center;
+}
+
 .cart-btn{
   width:100%;
   background:rgba(255,176,32,0.12);

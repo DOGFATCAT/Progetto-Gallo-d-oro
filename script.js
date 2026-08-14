@@ -320,6 +320,12 @@ function photoCardHtml(year, photoId, label, mediaHtml, hintCaption, votingEnabl
     ? `<button class="cart-btn" onclick="toggleCartItem(${year}, '${photoId}', this)">${isInCart(year, photoId) ? '✅ Nel carrello' : '🛒 Aggiungi al carrello'}</button>`
     : '';
 
+  // Piccolo avviso fisso (non richiudibile) su ogni foto reale, indipendente
+  // dal banner in cima al sito che invece si può chiudere.
+  const photoLegalTag = isRealPhoto
+    ? `<p class="photo-legal-tag">⚠️ Foto non utilizzabile a scopo di lucro</p>`
+    : '';
+
   const staggerDelay = (Number(label) % 8) * 55;
 
   if(!votingEnabled){
@@ -333,6 +339,7 @@ function photoCardHtml(year, photoId, label, mediaHtml, hintCaption, votingEnabl
           ${media}
           ${hintCaption ? `<div class="polaroid-cap">${hintCaption}</div>` : ''}
         </div>
+        ${photoLegalTag}
         ${cartButtonHtml}
         ${captionBlock}
       </div>
@@ -346,6 +353,7 @@ function photoCardHtml(year, photoId, label, mediaHtml, hintCaption, votingEnabl
         ${media}
         ${hintCaption ? `<div class="polaroid-cap">${hintCaption}</div>` : ''}
       </div>
+      ${photoLegalTag}
       ${cartButtonHtml}
       ${manualCaption ? `<p class="manual-caption"><b>Nota:</b> ${escapeHtml(manualCaption)}</p>` : ''}
       <form class="vote-form" onsubmit="return __vote(event, ${year}, '${photoId}')">
