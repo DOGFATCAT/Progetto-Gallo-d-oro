@@ -2,7 +2,7 @@
 
 Documento di riepilogo di tutto ciò che è stato costruito finora, per tenere traccia dello stato del sito, delle scelte fatte e di cosa resta da fare.
 
-**Ultimo aggiornamento:** 30 luglio 2026 (avviso fisso su ogni foto, non richiudibile)
+**Ultimo aggiornamento:** 30 luglio 2026 (avviso per-foto sostituito da un popup ad ogni visita della pagina foto)
 **Repository:** https://github.com/DOGFATCAT/Progetto-Gallo-d-oro
 **Sito online:** https://dogfatcat.github.io/Progetto-Gallo-d-oro/index.html
 
@@ -187,10 +187,9 @@ In parole semplici: chiunque può leggere foto/voti/anni attivi e votare o invia
 - **Comparsa morbida della pagina** all'apertura (dissolvenza), invece di un flash secco di caricamento
 - **Nota:** le animazioni vengono mostrate sempre a tutti, per scelta esplicita — inizialmente si disattivavano per chi ha "riduci movimento" attivo nel proprio dispositivo (buona pratica di accessibilità), ma su richiesta sono state rese sempre attive indipendentemente da quella preferenza
 
-### Avviso uso foto (banner)
-- Fascia rossa in cima a tutte e 3 le pagine del sito pubblico, che avvisa che le foto sono di proprietà del Festival e non possono essere usate a scopo di lucro né riprodotte senza autorizzazione
-- Si può chiudere con la "✕"; una volta chiusa non ricompare più su quel dispositivo/browser (salvato in localStorage), così non è invadente per chi torna spesso sul sito
-- **In aggiunta**, ogni singola foto reale ha anche un piccolo avviso fisso e **non richiudibile** sotto l'immagine ("⚠️ Foto non utilizzabile a scopo di lucro") — così l'avvertenza resta visibile anche se il banner in cima è già stato chiuso, o se qualcuno arriva con un link diretto a una foto
+### Avviso uso foto
+- **Pagine Storia e Scegli anno**: fascia rossa in cima, che avvisa che le foto sono di proprietà del Festival e non possono essere usate a scopo di lucro né riprodotte senza autorizzazione. Si può chiudere con la "✕"; una volta chiusa non ricompare più su quel dispositivo/browser (salvato in localStorage)
+- **Pagina Foto**: qui il banner è sostituito da un **popup che appare ad ogni visita** della pagina (non una volta sola come il banner) — bisogna cliccare "Ho capito" per chiuderlo. Si è provato prima con un piccolo avviso fisso sotto ogni singola foto, ma risultava troppo ingombrante insieme a tutti gli altri elementi (carrello, voto, classifica), quindi si è passati al popup
 
 ---
 

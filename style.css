@@ -540,17 +540,44 @@ h1.title span{
   margin-top:36px;
 }
 
-.photo-legal-tag{
-  font-size:0.72rem;
-  font-weight:600;
-  color:var(--crimson-bright);
-  background:rgba(255,92,92,0.1);
-  border:1px solid rgba(255,92,92,0.3);
-  border-radius:8px;
-  padding:6px 10px;
-  margin:0 0 12px;
-  text-align:center;
+.photo-warning-overlay{
+  position:fixed; inset:0;
+  background:rgba(5,7,13,0.88);
+  display:flex; align-items:center; justify-content:center;
+  padding:20px;
+  z-index:1050;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .2s ease;
 }
+.photo-warning-overlay.open{opacity:1; pointer-events:auto;}
+.photo-warning-card{
+  background:var(--cream);
+  color:var(--ink);
+  border-radius:20px;
+  padding:32px;
+  max-width:420px;
+  width:100%;
+  text-align:center;
+  box-shadow:0 30px 70px rgba(0,0,0,0.5);
+  border-top:6px solid transparent;
+  border-image:linear-gradient(90deg, var(--gold), var(--crimson)) 1;
+}
+.photo-warning-card .icon{font-size:2.2rem; display:block; margin-bottom:12px;}
+.photo-warning-card h3{
+  font-family:'Space Grotesk', sans-serif;
+  font-weight:800;
+  font-size:1.2rem;
+  margin:0 0 10px;
+  color:var(--ink);
+}
+.photo-warning-card p{
+  font-size:0.92rem;
+  color:var(--ink-soft);
+  line-height:1.6;
+  margin:0 0 22px;
+}
+.photo-warning-card .btn{width:100%;}
 
 .cart-btn{
   width:100%;

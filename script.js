@@ -320,12 +320,6 @@ function photoCardHtml(year, photoId, label, mediaHtml, hintCaption, votingEnabl
     ? `<button class="cart-btn" onclick="toggleCartItem(${year}, '${photoId}', this)">${isInCart(year, photoId) ? '✅ Nel carrello' : '🛒 Aggiungi al carrello'}</button>`
     : '';
 
-  // Piccolo avviso fisso (non richiudibile) su ogni foto reale, indipendente
-  // dal banner in cima al sito che invece si può chiudere.
-  const photoLegalTag = isRealPhoto
-    ? `<p class="photo-legal-tag">⚠️ Foto non utilizzabile a scopo di lucro</p>`
-    : '';
-
   const staggerDelay = (Number(label) % 8) * 55;
 
   if(!votingEnabled){
@@ -339,7 +333,6 @@ function photoCardHtml(year, photoId, label, mediaHtml, hintCaption, votingEnabl
           ${media}
           ${hintCaption ? `<div class="polaroid-cap">${hintCaption}</div>` : ''}
         </div>
-        ${photoLegalTag}
         ${cartButtonHtml}
         ${captionBlock}
       </div>
@@ -353,7 +346,6 @@ function photoCardHtml(year, photoId, label, mediaHtml, hintCaption, votingEnabl
         ${media}
         ${hintCaption ? `<div class="polaroid-cap">${hintCaption}</div>` : ''}
       </div>
-      ${photoLegalTag}
       ${cartButtonHtml}
       ${manualCaption ? `<p class="manual-caption"><b>Nota:</b> ${escapeHtml(manualCaption)}</p>` : ''}
       <form class="vote-form" onsubmit="return __vote(event, ${year}, '${photoId}')">
@@ -481,6 +473,39 @@ function mountLegalNotice(){
     <button onclick="dismissLegalNotice()" aria-label="Chiudi avviso">✕</button>
   `;
   document.body.insertBefore(banner, document.body.firstChild);
+}
+
+// ---------------- POPUP AVVISO SULLA PAGINA FOTO ----------------
+// A differenza del banner in cima (che una volta chiuso non ricompare più),
+// questo popup appare ad OGNI visita della pagina foto — richiamare solo da
+// pagina3-foto.html.
+function showPhotoWarningPopup(){
+  if(document.getElementById('photo-warning-overlay')) return;
+  const overlay = document.createElement('div');
+  overlay.id = 'photo-warning-overlay';
+  overlay.className = 'photo-warning-overlay';
+  overlay.onclick = () => closePhotoWarningPopup();
+  overlay.innerHTML = `
+    <div class="photo-warning-card" onclick="event.stopPropagation()">
+      <span class="icon">⚠️</span>
+      <h3>Un promemoria prima di continuare</h3>
+      <p>Le foto di questa pagina sono di proprietà del Festival Gallo d'Oro di Petriano e vengono condivise a solo scopo di ricordo e community. <b>Non possono essere utilizzate a scopo di lucro</b> né riprodotte senza autorizzazione.</p>
+      <button class="btn btn-primary" onclick="closePhotoWarningPopup()">Ho capito</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('open'));
+  document.addEventListener('keydown', __closePhotoWarningOnEsc);
+}
+window.closePhotoWarningPopup = function(){
+  const overlay = document.getElementById('photo-warning-overlay');
+  if(!overlay) return;
+  overlay.classList.remove('open');
+  document.removeEventListener('keydown', __closePhotoWarningOnEsc);
+  setTimeout(() => overlay.remove(), 200);
+};
+function __closePhotoWarningOnEsc(e){
+  if(e.key === 'Escape') window.closePhotoWarningPopup();
 }
 
 // ---------------- PULSANTE "TORNA SU" ----------------
