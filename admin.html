@@ -115,6 +115,18 @@
     margin-bottom:26px;
     box-shadow:0 10px 30px rgba(0,0,0,0.25);
   }
+  .panel-row{
+    display:flex;
+    gap:26px;
+    align-items:flex-start;
+  }
+  .panel-row .panel{ margin-bottom:0; }
+  .panel-grow{ flex:2 1 480px; }
+  .panel-narrow{ flex:1 1 220px; }
+  @media (max-width:760px){
+    .panel-row{ flex-direction:column; gap:0; }
+    .panel-row .panel{ margin-bottom:26px; }
+  }
   .panel h2::before{
     content:'';
     position:absolute; left:0; top:4px; bottom:4px;
@@ -126,6 +138,7 @@
     background:var(--cream); color:var(--ink);
     border:none; border-radius:6px; padding:10px 14px;
     font-size:0.95rem; font-weight:700; min-width:160px;
+    width:100%;
   }
   .year-toggle-grid{
     display:grid;
@@ -382,15 +395,17 @@
       <div id="requests-list">Caricamento…</div>
     </div>
 
-    <div class="panel">
-      <h2>Anni presenti (edizioni realmente svolte)</h2>
-      <p style="color:var(--cream-dim); font-size:0.88rem; margin:0 0 12px;">Seleziona solo gli anni in cui il Festival si è davvero svolto (alcuni anni potrebbe essere saltato). Il sito pubblico mostrerà solo questi.</p>
-      <div class="year-toggle-grid" id="year-toggle-grid"></div>
-    </div>
+    <div class="panel-row">
+      <div class="panel panel-grow">
+        <h2>Anni presenti (edizioni realmente svolte)</h2>
+        <p style="color:var(--cream-dim); font-size:0.88rem; margin:0 0 12px;">Seleziona solo gli anni in cui il Festival si è davvero svolto (alcuni anni potrebbe essere saltato). Il sito pubblico mostrerà solo questi.</p>
+        <div class="year-toggle-grid" id="year-toggle-grid"></div>
+      </div>
 
-    <div class="panel">
-      <h2>Seleziona edizione da modificare</h2>
-      <select id="year-select" onchange="onYearChange()"></select>
+      <div class="panel panel-narrow">
+        <h2>Seleziona edizione da modificare</h2>
+        <select id="year-select" onchange="onYearChange()"></select>
+      </div>
     </div>
 
     <div class="panel">
