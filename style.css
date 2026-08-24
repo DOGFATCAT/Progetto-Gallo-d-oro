@@ -343,12 +343,14 @@ h1.title span{
 .photo-card:hover{border-color:var(--gold); transform:translateY(-5px);}
 .polaroid{
   background:var(--cream);
-  padding:0;
-  border-radius:14px;
+  padding:10px 10px 0;
+  border-radius:4px;
   overflow:hidden;
   box-shadow:0 16px 34px rgba(0,0,0,0.4);
   margin-bottom:16px;
+  transform:rotate(-1.4deg);
 }
+.photo-card:nth-child(even) .polaroid{transform:rotate(1.3deg);}
 .photo-placeholder{
   background:
     radial-gradient(circle at 50% 40%, rgba(255,92,92,0.14), transparent 60%),
