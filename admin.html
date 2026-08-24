@@ -116,16 +116,15 @@
     box-shadow:0 10px 30px rgba(0,0,0,0.25);
   }
   .panel-row{
-    display:flex;
+    display:grid;
+    grid-template-columns:2fr 1fr;
     gap:26px;
     align-items:stretch;
   }
-  .panel-row .panel{ margin-bottom:0; }
-  .panel-grow{ flex:2 1 480px; }
-  .panel-narrow{ flex:1 1 220px; }
+  .panel-row .panel{ margin-bottom:0; height:100%; box-sizing:border-box; }
   @media (max-width:760px){
-    .panel-row{ flex-direction:column; gap:0; }
-    .panel-row .panel{ margin-bottom:26px; }
+    .panel-row{ grid-template-columns:1fr; gap:0; }
+    .panel-row .panel{ margin-bottom:26px; height:auto; }
   }
   .panel h2::before{
     content:'';
