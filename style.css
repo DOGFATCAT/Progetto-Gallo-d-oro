@@ -329,7 +329,8 @@ h1.title span{
 /* ---------- PAGINA 3: FOTO + CLASSIFICA ---------- */
 .photo-grid{
   display:grid;
-  grid-template-columns:repeat(auto-fill, minmax(260px,1fr));
+  grid-template-columns:repeat(auto-fit, minmax(260px, 320px));
+  justify-content:center;
   gap:26px;
   margin-top:10px;
 }
@@ -881,7 +882,7 @@ body.page-ready{opacity:1;}
   .ticket{ padding:18px 18px 16px; border-radius:14px; }
   .ticket .tk-year{ font-size:1.9rem; }
 
-  .photo-grid{ grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:18px; }
+  .photo-grid{ grid-template-columns:repeat(auto-fit, minmax(220px, 280px)); justify-content:center; gap:18px; }
 
   .cart-panel{ padding:22px; max-height:90vh; }
   .cart-fab{ bottom:16px; right:16px; padding:13px 18px; font-size:1rem; }
