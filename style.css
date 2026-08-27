@@ -46,12 +46,21 @@ body::before, body::after{
   z-index:0;
   pointer-events:none;
   background:
-    radial-gradient(ellipse at 50% -8%, rgba(255,209,102,0.28), transparent 45%),
+    linear-gradient(180deg, rgba(0,0,0,0.55) 0px, transparent 90px),
+    radial-gradient(ellipse at 50% -8%, rgba(255,209,102,0.22), transparent 45%),
     repeating-linear-gradient(90deg,
-      rgba(0,0,0,0.18) 0px, transparent 14px,
-      rgba(255,255,255,0.05) 22px, transparent 34px
+      rgba(0,0,0,0.42) 0px,
+      rgba(0,0,0,0.12) 9px,
+      rgba(255,255,255,0.24) 18px,
+      rgba(0,0,0,0.08) 27px,
+      rgba(0,0,0,0.42) 38px
     ),
-    linear-gradient(180deg, #3a0f12 0%, var(--crimson) 45%, #4a1216 100%);
+    repeating-linear-gradient(90deg,
+      rgba(0,0,0,0.16) 0px,
+      transparent 28px,
+      rgba(0,0,0,0.16) 61px
+    ),
+    linear-gradient(180deg, #2b0a0d 0%, var(--crimson) 42%, #3a0f12 100%);
 }
 body::before{
   left:0;
