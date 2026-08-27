@@ -42,7 +42,7 @@ body::before, body::after{
   position:fixed;
   top:0; bottom:0;
   width:calc((100vw - 1040px) / 2);
-  max-width:340px;
+  max-width:700px;
   z-index:0;
   pointer-events:none;
   background:
