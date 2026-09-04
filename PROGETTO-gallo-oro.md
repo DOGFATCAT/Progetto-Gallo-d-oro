@@ -2,7 +2,7 @@
 
 Documento di riepilogo di tutto ciò che è stato costruito finora, per tenere traccia dello stato del sito, delle scelte fatte e di cosa resta da fare.
 
-**Ultimo aggiornamento:** 30 luglio 2026 (fix: il vento non fa più sovrapporre/staccare il sipario dal contenuto)
+**Ultimo aggiornamento:** 30 luglio 2026 (sipari: fermi solo in alto, ondeggiano di più verso il basso come appesi a una barra)
 **Repository:** https://github.com/DOGFATCAT/Progetto-Gallo-d-oro
 **Sito online:** https://dogfatcat.github.io/Progetto-Gallo-d-oro/index.html
 
