@@ -64,6 +64,7 @@ body::before, body::after{
 }
 body::before{
   left:0;
+  transform-origin:100% 50%;
   box-shadow:inset -6px 0 0 rgba(215,164,92,0.45), inset -30px 0 60px rgba(0,0,0,0.5);
   animation-name:curtain-open-left, curtain-glow-pulse, curtain-wind;
   animation-duration:1.4s, 8s, 7s;
@@ -74,6 +75,7 @@ body::before{
 }
 body::after{
   right:0;
+  transform-origin:0% 50%;
   box-shadow:inset 6px 0 0 rgba(215,164,92,0.45), inset 30px 0 60px rgba(0,0,0,0.5);
   animation-name:curtain-open-right, curtain-glow-pulse, curtain-wind;
   animation-duration:1.4s, 8s, 7.5s;
@@ -95,10 +97,10 @@ body::after{
   50%{ filter:brightness(1.07); }
 }
 @keyframes curtain-wind{
-  0%, 100%{ transform:translateX(0) skewY(0deg) scaleX(1); }
-  25%{ transform:translateX(3px) skewY(0.5deg) scaleX(1.006); }
-  50%{ transform:translateX(-2px) skewY(-0.35deg) scaleX(0.996); }
-  75%{ transform:translateX(4px) skewY(0.4deg) scaleX(1.008); }
+  0%, 100%{ transform:skewY(0deg) scaleX(1); }
+  25%{ transform:skewY(0.45deg) scaleX(1.006); }
+  50%{ transform:skewY(-0.3deg) scaleX(0.997); }
+  75%{ transform:skewY(0.35deg) scaleX(1.008); }
 }
 @media (max-width:1400px){
   body::before, body::after{ display:none; }
