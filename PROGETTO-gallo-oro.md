@@ -2,7 +2,7 @@
 
 Documento di riepilogo di tutto ciò che è stato costruito finora, per tenere traccia dello stato del sito, delle scelte fatte e di cosa resta da fare.
 
-**Ultimo aggiornamento:** 30 luglio 2026 (sipari: fermi solo in alto, ondeggiano di più verso il basso come appesi a una barra)
+**Ultimo aggiornamento:** 30 luglio 2026 (aggiunta favicon con l'emoji del gallo, per Google e la scheda del browser)
 **Repository:** https://github.com/DOGFATCAT/Progetto-Gallo-d-oro
 **Sito online:** https://dogfatcat.github.io/Progetto-Gallo-d-oro/index.html
 
@@ -186,6 +186,11 @@ In parole semplici: chiunque può leggere foto/voti/anni attivi e votare o invia
 - **Rimbalzo del carrello** 🛒 quando si aggiunge una foto
 - **Comparsa morbida della pagina** all'apertura (dissolvenza), invece di un flash secco di caricamento
 - **Nota:** le animazioni vengono mostrate sempre a tutti, per scelta esplicita — inizialmente si disattivavano per chi ha "riduci movimento" attivo nel proprio dispositivo (buona pratica di accessibilità), ma su richiesta sono state rese sempre attive indipendentemente da quella preferenza
+
+### Favicon
+- Icona del sito (quella che compare nella scheda del browser e accanto al nome nei risultati di Google): un cerchio scuro con bordo dorato e l'emoji del gallo 🐓 al centro
+- File: `favicon-32.png`, `favicon-180.png`, `favicon-192.png` (più dimensioni per browser/dispositivi diversi), collegati in tutte e 4 le pagine (`index.html`, `pagina2-anni.html`, `pagina3-foto.html`, `admin.html`)
+- Nota: Google aggiorna l'icona nei risultati di ricerca con i suoi tempi (non è immediato come il resto del sito), quindi può volerci qualche giorno prima di vederla comparire lì
 
 ### Avviso uso foto
 - **Pagine Storia e Scegli anno**: fascia rossa in cima, che avvisa che le foto sono di proprietà del Festival e non possono essere usate a scopo di lucro né riprodotte senza autorizzazione. Si può chiudere con la "✕"; una volta chiusa non ricompare più su quel dispositivo/browser (salvato in localStorage)
