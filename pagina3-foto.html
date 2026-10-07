@@ -68,6 +68,7 @@
   const year = params.get('anno');
 
   if(year) setLastYear(year); // ricorda l'anno PRIMA di disegnare il menu
+  checkSiteGate();
   mountNav('foto');
   mountCartWidget();
   showPhotoWarningPopup();

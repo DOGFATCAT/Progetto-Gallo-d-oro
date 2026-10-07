@@ -462,6 +462,82 @@ function dismissLegalNotice(){
 }
 window.dismissLegalNotice = dismissLegalNotice;
 
+// ---------------- PROTEZIONE SITO (utente/password, facoltativa) ----------------
+// Non è una vera sicurezza (il sito è statico, senza server): serve solo a
+// tenere fuori i visitatori casuali. La password non è mai salvata in chiaro,
+// solo la sua impronta SHA-256.
+const SITE_GATE_UNLOCK_KEY = 'gallo-oro-site-unlocked';
+
+async function sha256Hex(text){
+  const enc = new TextEncoder().encode(text);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+async function checkSiteGate(){
+  let gate = null;
+  try{
+    const snap = await db.ref('meta/siteGate').once('value');
+    gate = snap.val();
+  }catch(e){
+    console.error('Errore lettura protezione sito', e);
+  }
+  if(!gate || !gate.enabled) return; // nessuna protezione attiva
+
+  const unlockedFor = (() => {
+    try{ return localStorage.getItem(SITE_GATE_UNLOCK_KEY); }
+    catch(e){ return null; }
+  })();
+  if(unlockedFor && unlockedFor === gate.passwordHash) return; // già sbloccato
+
+  showSiteGateOverlay(gate);
+}
+
+function showSiteGateOverlay(gate){
+  if(document.getElementById('site-gate-overlay')) return;
+  document.body.classList.add('site-locked');
+  window.__currentGate = gate;
+  const overlay = document.createElement('div');
+  overlay.id = 'site-gate-overlay';
+  overlay.className = 'site-gate-overlay';
+  overlay.innerHTML = `
+    <div class="site-gate-card">
+      <span class="icon">🔒</span>
+      <h3>Accesso riservato</h3>
+      <p>Questo sito è momentaneamente protetto. Inserisci utente e password per continuare.</p>
+      <div class="cart-field">
+        <label for="gate-user">Utente</label>
+        <input type="text" id="gate-user" autocomplete="username">
+      </div>
+      <div class="cart-field">
+        <label for="gate-pass">Password</label>
+        <input type="password" id="gate-pass" autocomplete="current-password" onkeydown="if(event.key==='Enter') submitSiteGate()">
+      </div>
+      <button class="btn btn-primary" onclick="submitSiteGate()">Entra</button>
+      <p class="cart-status" id="gate-status"></p>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+window.submitSiteGate = async function(){
+  const gate = window.__currentGate;
+  const user = document.getElementById('gate-user').value.trim();
+  const pass = document.getElementById('gate-pass').value;
+  const statusEl = document.getElementById('gate-status');
+  if(!user || !pass){ statusEl.textContent = 'Inserisci utente e password.'; return; }
+  statusEl.textContent = 'Verifica…';
+  const passHash = await sha256Hex(pass);
+  if(user === gate.username && passHash === gate.passwordHash){
+    try{ localStorage.setItem(SITE_GATE_UNLOCK_KEY, gate.passwordHash); }catch(e){}
+    const overlay = document.getElementById('site-gate-overlay');
+    if(overlay) overlay.remove();
+    document.body.classList.remove('site-locked');
+  } else {
+    statusEl.textContent = '❌ Utente o password errati.';
+  }
+};
+
 function mountLegalNotice(){
   if(isLegalNoticeDismissed()) return;
   if(document.getElementById('legal-notice')) return;

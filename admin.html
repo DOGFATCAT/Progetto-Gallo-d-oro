@@ -393,6 +393,23 @@
     </div>
 
     <div class="panel">
+      <h2>🔒 Protezione sito (facoltativa)</h2>
+      <p style="color:var(--cream-dim); font-size:0.88rem; margin:0 0 14px;">Se attiva, chi visita il sito deve inserire utente e password prima di vedere qualsiasi pagina. Utile per periodi di test o accesso riservato temporaneo — non è una sicurezza vera e propria (il sito resta statico), ma tiene fuori i visitatori casuali.</p>
+      <div class="watermark-toggle" id="gate-status-toggle" style="cursor:pointer;" onclick="toggleSiteGateEnabled()">
+        <span id="gate-status-icon">⏳</span>
+        <span id="gate-status-text">Caricamento stato…</span>
+      </div>
+      <div style="margin-top:18px; display:flex; flex-direction:column; gap:4px; max-width:360px;">
+        <label class="number-label">Utente</label>
+        <input type="text" id="gate-set-user" class="caption-input" style="margin-top:4px;" placeholder="es. gallooro">
+        <label class="number-label" style="margin-top:10px;">Password</label>
+        <input type="password" id="gate-set-pass" class="caption-input" style="margin-top:4px;" placeholder="Scegli una password">
+        <button class="save-caption-btn" style="margin-top:12px;" onclick="saveSiteGateCredentials()">💾 Salva utente e password</button>
+        <p style="color:var(--gold-bright); font-size:0.8rem; min-height:1.2em; margin:8px 0 0;" id="gate-save-status"></p>
+      </div>
+    </div>
+
+    <div class="panel">
       <h2>📬 Richieste foto ricevute</h2>
       <p style="color:var(--cream-dim); font-size:0.88rem; margin:0 0 12px;">Le persone scelgono le foto dal sito e inviano qui la loro richiesta con nome ed email. Rispondi tu a mano allegando le foto senza filigrana, poi segna la richiesta come evasa.</p>
       <div id="requests-list">Caricamento…</div>
@@ -514,6 +531,7 @@
       document.getElementById('who-email').textContent = user.email;
       initActiveYearsAndSelect();
       loadRequests();
+      loadSiteGateStatus();
       startInactivityTracking();
     } else {
       document.getElementById('login-screen').classList.remove('hidden');
@@ -602,6 +620,76 @@
   function currentYear(){
     return document.getElementById('year-select').value;
   }
+
+  // ---------------- PROTEZIONE SITO (utente/password, facoltativa) ----------------
+  // La password non viene mai salvata in chiaro: solo la sua impronta SHA-256.
+  async function sha256Hex(text){
+    const enc = new TextEncoder().encode(text);
+    const buf = await crypto.subtle.digest('SHA-256', enc);
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  let currentGateData = { enabled:false, username:'', passwordHash:'' };
+
+  async function loadSiteGateStatus(){
+    try{
+      const snap = await db.ref('meta/siteGate').once('value');
+      currentGateData = snap.val() || { enabled:false, username:'', passwordHash:'' };
+    }catch(e){
+      console.error('Errore lettura protezione sito', e);
+      currentGateData = { enabled:false, username:'', passwordHash:'' };
+    }
+    renderGateStatus();
+  }
+
+  function renderGateStatus(){
+    const icon = document.getElementById('gate-status-icon');
+    const text = document.getElementById('gate-status-text');
+    if(!icon || !text) return;
+    if(currentGateData.enabled){
+      icon.textContent = '✅';
+      text.textContent = `Protezione ATTIVA (utente: ${currentGateData.username || '(non impostato)'}) — clicca per disattivare`;
+    } else {
+      icon.textContent = '🚫';
+      text.textContent = 'Protezione DISATTIVATA — clicca per attivare';
+    }
+  }
+
+  window.toggleSiteGateEnabled = async function(){
+    if(!currentGateData.passwordHash){
+      alert('Imposta prima utente e password qui sotto, poi potrai attivare la protezione.');
+      return;
+    }
+    const newEnabled = !currentGateData.enabled;
+    try{
+      await db.ref('meta/siteGate').update({ enabled: newEnabled });
+      currentGateData.enabled = newEnabled;
+      renderGateStatus();
+    }catch(e){
+      console.error('Errore aggiornamento protezione', e);
+      alert('Errore, riprova.');
+    }
+  };
+
+  window.saveSiteGateCredentials = async function(){
+    const user = document.getElementById('gate-set-user').value.trim();
+    const pass = document.getElementById('gate-set-pass').value;
+    const statusEl = document.getElementById('gate-save-status');
+    if(!user || !pass){ statusEl.textContent = 'Inserisci sia utente che password.'; return; }
+    statusEl.textContent = 'Salvataggio…';
+    try{
+      const passwordHash = await sha256Hex(pass);
+      const enabled = currentGateData ? currentGateData.enabled : false;
+      await db.ref('meta/siteGate').set({ enabled, username: user, passwordHash });
+      currentGateData = { enabled, username: user, passwordHash };
+      renderGateStatus();
+      statusEl.textContent = '✅ Salvato.';
+      document.getElementById('gate-set-pass').value = '';
+    }catch(e){
+      console.error('Errore salvataggio credenziali', e);
+      statusEl.textContent = 'Errore, riprova.';
+    }
+  };
 
   // ---------------- RICHIESTE FOTO (dalle persone, tramite il carrello) ----------------
   async function loadRequests(){

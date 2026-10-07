@@ -2,7 +2,7 @@
 
 Documento di riepilogo di tutto ciò che è stato costruito finora, per tenere traccia dello stato del sito, delle scelte fatte e di cosa resta da fare.
 
-**Ultimo aggiornamento:** 30 luglio 2026 (aggiunta favicon con l'emoji del gallo, per Google e la scheda del browser)
+**Ultimo aggiornamento:** 30 luglio 2026 (protezione sito opzionale utente/password, attivabile da admin)
 **Repository:** https://github.com/DOGFATCAT/Progetto-Gallo-d-oro
 **Sito online:** https://dogfatcat.github.io/Progetto-Gallo-d-oro/index.html
 
@@ -62,6 +62,11 @@ photos/
 meta/
   activeYears/
     {anno}: true   (solo gli anni realmente esistiti, impostati a mano in admin)
+  siteGate: {
+    enabled: true/false,   (protezione utente/password attiva o no)
+    username: "...",
+    passwordHash: "..."    (impronta SHA-256, mai la password in chiaro)
+  }
 
 requests/
   {idRichiesta}: {
@@ -186,6 +191,12 @@ In parole semplici: chiunque può leggere foto/voti/anni attivi e votare o invia
 - **Rimbalzo del carrello** 🛒 quando si aggiunge una foto
 - **Comparsa morbida della pagina** all'apertura (dissolvenza), invece di un flash secco di caricamento
 - **Nota:** le animazioni vengono mostrate sempre a tutti, per scelta esplicita — inizialmente si disattivavano per chi ha "riduci movimento" attivo nel proprio dispositivo (buona pratica di accessibilità), ma su richiesta sono state rese sempre attive indipendentemente da quella preferenza
+
+### Protezione sito (utente/password, facoltativa)
+- Nuovo pannello in admin **"🔒 Protezione sito"**: si imposta un utente e una password (senza email), si attiva/disattiva con un click, e lo stato è ben visibile (✅ ATTIVA / 🚫 DISATTIVATA)
+- Quando è attiva, **tutte e 3 le pagine pubbliche** mostrano una schermata di blocco a tutto schermo prima di far vedere qualunque contenuto; una volta inserite le credenziali corrette, il browser resta "sbloccato" (salvato in localStorage) finché la password non viene cambiata
+- La password **non è mai salvata in chiaro**: solo la sua impronta SHA-256, calcolata nel browser prima dell'invio
+- **Nota onesta sui limiti**: essendo un sito statico (senza un vero server), questa non è una sicurezza vera e propria — serve a tenere fuori i visitatori casuali, non a proteggere dati sensibili. Riusa le regole già esistenti sul nodo `meta` (lettura pubblica, scrittura riservata all'email admin), nessuna modifica alle regole è stata necessaria
 
 ### Favicon
 - Icona del sito (quella che compare nella scheda del browser e accanto al nome nei risultati di Google): un cerchio scuro con bordo dorato e l'emoji del gallo 🐓 al centro

@@ -822,6 +822,42 @@ h1.title span{
   min-height:1.2em;
 }
 
+.site-gate-overlay{
+  position:fixed; inset:0;
+  background:var(--night-deep);
+  display:flex; align-items:center; justify-content:center;
+  padding:20px;
+  z-index:5000;
+}
+.site-gate-card{
+  background:var(--cream);
+  color:var(--ink);
+  border-radius:20px;
+  padding:36px;
+  max-width:380px;
+  width:100%;
+  text-align:center;
+  box-shadow:0 30px 70px rgba(0,0,0,0.5);
+  border-top:6px solid transparent;
+  border-image:linear-gradient(90deg, var(--gold), var(--crimson)) 1;
+}
+.site-gate-card .icon{font-size:2.2rem; display:block; margin-bottom:12px;}
+.site-gate-card h3{
+  font-family:'Space Grotesk', sans-serif;
+  font-weight:800;
+  font-size:1.2rem;
+  margin:0 0 8px;
+}
+.site-gate-card p{
+  font-size:0.88rem;
+  color:var(--ink-soft);
+  margin:0 0 20px;
+  line-height:1.5;
+}
+.site-gate-card .cart-field{ text-align:left; margin-bottom:12px; }
+.site-gate-card .btn{ width:100%; margin-top:6px; }
+body.site-locked{ overflow:hidden; }
+
 .legal-notice{
   display:flex;
   align-items:center;
