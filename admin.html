@@ -248,6 +248,22 @@
     letter-spacing:0.03em;
     color:var(--ink-soft);
   }
+  .thumb.modified{ outline:3px solid var(--gold); outline-offset:-1px; }
+  .thumb.to-delete{ outline-color:var(--crimson); opacity:0.5; }
+  .thumb.to-delete img{ filter:grayscale(1); }
+  .pending-bar{
+    display:none; position:fixed; left:0; right:0; bottom:0; z-index:900;
+    background:rgba(5,7,13,0.96);
+    border-top:2px solid var(--gold);
+    padding:14px 28px;
+    align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+    box-shadow:0 -12px 30px rgba(0,0,0,0.45);
+  }
+  .pending-bar.show{ display:flex; }
+  .pending-info{ color:var(--gold-bright); font-size:0.95rem; }
+  .pending-info span{ color:var(--crimson-bright); }
+  .pending-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+  body.has-pending .wrap{ padding-bottom:120px; }
   .number-row{
     display:flex;
     gap:6px;
@@ -444,8 +460,17 @@
 
     <div class="panel">
       <h2>Foto già caricate per questo anno</h2>
+      <p style="color:var(--cream-dim); font-size:0.88rem; margin:0 0 12px;">Le modifiche (numero, didascalia, voto, eliminazione) <b>non vengono salvate subito</b>: le foto modificate si evidenziano e puoi applicarle tutte insieme col pulsante in basso.</p>
       <div class="grid" id="existing-grid"></div>
     </div>
+  </div>
+</div>
+
+<div id="pending-bar" class="pending-bar">
+  <div class="pending-info"><b id="pending-text"></b><span id="pending-del"></span></div>
+  <div class="pending-actions">
+    <button class="btn btn-ghost" onclick="discardPending()">↩︎ Annulla modifiche</button>
+    <button class="btn btn-gold" id="pending-apply" onclick="applyPending()">✅ Applica tutte le modifiche</button>
   </div>
 </div>
 
@@ -491,7 +516,11 @@
     input.type = isHidden ? 'text' : 'password';
   };
 
-  window.doLogout = function(){ auth.signOut(); };
+  window.doLogout = function(){
+    if(typeof pendingCount === 'function' && pendingCount() > 0 &&
+       !confirm('Hai modifiche non ancora applicate: uscendo andranno perse. Uscire lo stesso?')) return;
+    auth.signOut();
+  };
 
   // ---------------- DISCONNESSIONE AUTOMATICA PER INATTIVITÀ ----------------
   // Se non c'è nessuna interazione per 15 minuti mentre si è loggati,
@@ -615,7 +644,16 @@
     }
   };
 
-  window.onYearChange = function(){ loadExisting(); };
+  window.onYearChange = function(){
+    if(typeof pendingCount === 'function' && pendingCount() > 0){
+      if(!confirm('Hai modifiche non ancora applicate: cambiando anno andranno perse. Continuare?')){
+        document.getElementById('year-select').value = loadedYear;
+        return;
+      }
+      pendingChanges = {};
+    }
+    loadExisting();
+  };
 
   function currentYear(){
     return document.getElementById('year-select').value;
@@ -781,129 +819,186 @@
     return d.innerHTML;
   }
 
+  // ---------------- MODIFICHE IN SOSPESO (applicate tutte insieme) ----------------
+  // Le modifiche a numero, didascalia, voto ed eliminazione NON vengono salvate
+  // subito: restano in memoria, evidenziate, e si applicano insieme col pulsante
+  // "Applica tutte le modifiche" (una sola scrittura sul database).
+  let photoOriginals = {};   // id -> { data, voting, caption, number, wasString }
+  let pendingChanges = {};   // id -> { voting?, caption?, number?, deleted? }
+  let loadedYear = null;
+
+  function attrEsc(s){
+    return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function pendingCount(){ return Object.keys(pendingChanges).length; }
+  function effectivePhoto(id){ return { ...photoOriginals[id], ...(pendingChanges[id] || {}) }; }
+
+  function setPending(id, patch){
+    const o = photoOriginals[id];
+    if(!o) return;
+    const p = { ...(pendingChanges[id] || {}), ...patch };
+    ['voting','caption','number'].forEach(k => { if(k in p && p[k] === o[k]) delete p[k]; });
+    if(!p.deleted) delete p.deleted;
+    if(Object.keys(p).length === 0) delete pendingChanges[id]; else pendingChanges[id] = p;
+    refreshCard(id);
+    refreshPendingBar();
+  }
+
+  function refreshCard(id){
+    const card = document.getElementById('thumb-' + id);
+    if(!card) return;
+    const e = effectivePhoto(id);
+    const p = pendingChanges[id];
+    card.classList.toggle('modified', !!p);
+    card.classList.toggle('to-delete', !!(p && p.deleted));
+    card.querySelector('.cap-label').textContent = e.number ? ('#' + e.number) : id.slice(0,8);
+    card.querySelector('.del').textContent = (p && p.deleted) ? 'Annulla eliminazione' : 'Elimina';
+    const vt = card.querySelector('.vote-toggle');
+    vt.className = 'vote-toggle ' + (e.voting ? 'on' : 'off');
+    vt.textContent = e.voting ? '🗳️ Voto attivo' : '🚫 Voto disattivo (foto di gruppo)';
+  }
+
+  function refreshPendingBar(){
+    const bar = document.getElementById('pending-bar');
+    if(!bar) return;
+    const n = pendingCount();
+    const dels = Object.values(pendingChanges).filter(p => p.deleted).length;
+    bar.classList.toggle('show', n > 0);
+    document.body.classList.toggle('has-pending', n > 0);
+    document.getElementById('pending-text').textContent =
+      n === 1 ? '1 foto con modifiche in sospeso' : `${n} foto con modifiche in sospeso`;
+    document.getElementById('pending-del').textContent = dels ? ` · ${dels} da eliminare` : '';
+  }
+
+  window.onNumberInput = function(id, v){ setPending(id, { number: v.trim() }); };
+  window.onCaptionInput = function(id, v){ setPending(id, { caption: v.trim() }); };
+  window.onToggleVoting = function(id){ setPending(id, { voting: !effectivePhoto(id).voting }); };
+  window.onToggleDelete = function(id){
+    const p = pendingChanges[id];
+    setPending(id, { deleted: !(p && p.deleted) });
+  };
+
+  window.discardPending = function(){
+    if(!pendingCount()) return;
+    if(!confirm('Annullare tutte le modifiche non ancora applicate?')) return;
+    pendingChanges = {};
+    renderExisting();
+    refreshPendingBar();
+  };
+
+  window.applyPending = async function(){
+    const n = pendingCount();
+    if(!n || !loadedYear) return;
+    const dels = Object.values(pendingChanges).filter(p => p.deleted).length;
+    if(dels && !confirm(`Stai per eliminare definitivamente ${dels} foto (con i loro voti). Continuare?`)) return;
+
+    const year = loadedYear;
+    const btn = document.getElementById('pending-apply');
+    btn.disabled = true;
+    btn.textContent = 'Applico…';
+
+    const photoUpdates = {};
+    const voteUpdates = {};
+    for(const [id, p] of Object.entries(pendingChanges)){
+      if(p.deleted){ photoUpdates[id] = null; voteUpdates[id] = null; continue; }
+      const e = effectivePhoto(id);
+      if(photoOriginals[id].wasString){
+        // formato vecchio (solo immagine): lo converto nel formato nuovo
+        photoUpdates[id] = { data: e.data, voting: e.voting, caption: e.caption, number: e.number };
+      } else {
+        if('voting' in p) photoUpdates[`${id}/voting`] = e.voting;
+        if('caption' in p) photoUpdates[`${id}/caption`] = e.caption;
+        if('number' in p) photoUpdates[`${id}/number`] = e.number;
+      }
+    }
+
+    try{
+      await db.ref(`photos/${year}`).update(photoUpdates); // una sola scrittura atomica
+    }catch(err){
+      console.error('Errore applicazione modifiche', err);
+      alert('Errore nel salvataggio: nessuna modifica è stata applicata. Riprova.');
+      btn.disabled = false;
+      btn.textContent = '✅ Applica tutte le modifiche';
+      return;
+    }
+    if(Object.keys(voteUpdates).length){
+      try{ await db.ref(`votes/${year}`).update(voteUpdates); }
+      catch(err){ console.error('Errore eliminazione voti collegati', err); }
+    }
+    pendingChanges = {};
+    btn.disabled = false;
+    btn.textContent = '✅ Applica tutte le modifiche';
+    await loadExisting();
+    refreshPendingBar();
+  };
+
+  window.addEventListener('beforeunload', e => {
+    if(pendingCount() > 0){ e.preventDefault(); e.returnValue = ''; }
+  });
+
+  function renderExisting(){
+    const grid = document.getElementById('existing-grid');
+    const year = loadedYear;
+    const ids = Object.keys(photoOriginals);
+    if(ids.length === 0){
+      grid.innerHTML = '<p style="color:var(--cream-dim); font-size:0.85rem;">Nessuna foto caricata per questo anno.</p>';
+      return;
+    }
+    grid.innerHTML = ids
+      .map(id => ({ id, ...effectivePhoto(id) }))
+      .sort((a, b) => {
+        const na = parseInt(a.number, 10), nb = parseInt(b.number, 10);
+        if(!isNaN(na) && !isNaN(nb)) return na - nb;
+        if(!isNaN(na)) return -1;
+        if(!isNaN(nb)) return 1;
+        return 0;
+      })
+      .map(({ id, data: imgSrc, voting, caption, number }) => `
+        <div class="thumb" id="thumb-${id}">
+          <img src="${imgSrc}" alt="Foto ${year}">
+          <div class="cap">
+            <span class="cap-label">${number ? ('#' + escapeForTextarea(String(number))) : id.slice(0,8)}</span>
+            <button class="del" onclick="onToggleDelete('${id}')">Elimina</button>
+          </div>
+          <label class="number-label">Numero foto (la griglia si riordina dopo l'applicazione)</label>
+          <div class="number-row">
+            <input type="text" class="number-input" value="${attrEsc(number)}" placeholder="es. 12" oninput="onNumberInput('${id}', this.value)">
+          </div>
+          <button class="vote-toggle ${voting ? 'on' : 'off'}" onclick="onToggleVoting('${id}')">
+            ${voting ? '🗳️ Voto attivo' : '🚫 Voto disattivo (foto di gruppo)'}
+          </button>
+          <textarea class="caption-input" placeholder="Chi si vede in questa foto? (facoltativo)" oninput="onCaptionInput('${id}', this.value)">${escapeForTextarea(caption)}</textarea>
+        </div>
+      `).join('');
+    ids.forEach(refreshCard); // riapplica evidenziazioni delle modifiche in sospeso
+  }
+
   async function loadExisting(){
     const year = currentYear();
     const grid = document.getElementById('existing-grid');
     if(!year){
       grid.innerHTML = '<p style="color:var(--cream-dim); font-size:0.85rem;">Seleziona prima almeno un anno attivo qui sopra.</p>';
+      photoOriginals = {}; pendingChanges = {}; loadedYear = null;
+      refreshPendingBar();
       return;
     }
+    if(year !== loadedYear){ pendingChanges = {}; } // anno diverso: le modifiche in sospeso non valgono più
     grid.innerHTML = '<p style="color:var(--cream-dim); font-size:0.85rem;">Caricamento…</p>';
     try{
       const snap = await db.ref(`photos/${year}`).once('value');
       const data = snap.val() || {};
-      const entries = Object.entries(data);
-      if(entries.length === 0){
-        grid.innerHTML = '<p style="color:var(--cream-dim); font-size:0.85rem;">Nessuna foto caricata per questo anno.</p>';
-        return;
-      }
-      grid.innerHTML = entries
-        .map(([id, rawVal]) => ({ id, ...normalizePhotoValue(rawVal) }))
-        .sort((a, b) => {
-          const na = parseInt(a.number, 10), nb = parseInt(b.number, 10);
-          if(!isNaN(na) && !isNaN(nb)) return na - nb;
-          if(!isNaN(na)) return -1;
-          if(!isNaN(nb)) return 1;
-          return 0;
-        })
-        .map(({ id, data: imgSrc, voting, caption, number }) => `
-        <div class="thumb" id="thumb-${id}">
-          <img src="${imgSrc}" alt="Foto ${year}">
-          <div class="cap">
-            <span>${number ? ('#' + escapeForTextarea(String(number))) : id.slice(0,8)}</span>
-            <button class="del" onclick="deletePhoto('${year}','${id}')">Elimina</button>
-          </div>
-          <label class="number-label">Numero foto (per ritrovarla facilmente)</label>
-          <div class="number-row">
-            <input type="text" class="number-input" data-year="${year}" data-id="${id}" value="${escapeForTextarea(number)}" placeholder="es. 12">
-            <button class="save-number-btn" onclick="saveNumber(this)">💾</button>
-          </div>
-          <button class="vote-toggle ${voting ? 'on' : 'off'}" onclick="toggleVoting('${year}','${id}', ${voting})">
-            ${voting ? '🗳️ Voto attivo' : '🚫 Voto disattivo (foto di gruppo)'}
-          </button>
-          <textarea class="caption-input" data-year="${year}" data-id="${id}" placeholder="Chi si vede in questa foto? (facoltativo)">${escapeForTextarea(caption)}</textarea>
-          <button class="save-caption-btn" onclick="saveCaption(this)">💾 Salva didascalia</button>
-        </div>
-      `).join('');
+      photoOriginals = {};
+      Object.entries(data).forEach(([id, raw]) => {
+        photoOriginals[id] = { ...normalizePhotoValue(raw), wasString: typeof raw === 'string' };
+      });
+      loadedYear = year;
+      Object.keys(pendingChanges).forEach(id => { if(!photoOriginals[id]) delete pendingChanges[id]; });
+      renderExisting();
+      refreshPendingBar();
     }catch(e){
       grid.innerHTML = '<p class="error">Errore nel caricamento delle foto.</p>';
     }
   }
-
-  window.toggleVoting = async function(year, id, currentlyVoting){
-    try{
-      const snap = await db.ref(`photos/${year}/${id}`).once('value');
-      const { data, caption, number } = normalizePhotoValue(snap.val());
-      await db.ref(`photos/${year}/${id}`).set({ data, voting: !currentlyVoting, caption, number });
-      loadExisting();
-    }catch(e){
-      console.error('Errore aggiornamento voto foto', e);
-      alert('Errore nel salvataggio, riprova.');
-    }
-  };
-
-  window.saveCaption = async function(btn){
-    const wrapper = btn.closest('.thumb');
-    const textarea = wrapper.querySelector('.caption-input');
-    const year = textarea.dataset.year;
-    const id = textarea.dataset.id;
-    const newCaption = textarea.value.trim();
-    const originalLabel = btn.textContent;
-    btn.disabled = true;
-    btn.textContent = 'Salvo…';
-    try{
-      const snap = await db.ref(`photos/${year}/${id}`).once('value');
-      const { data, voting, number } = normalizePhotoValue(snap.val());
-      await db.ref(`photos/${year}/${id}`).set({ data, voting, caption: newCaption, number });
-      btn.textContent = '✅ Salvato';
-    }catch(e){
-      console.error('Errore salvataggio didascalia', e);
-      btn.textContent = '⚠️ Errore, riprova';
-    }
-    setTimeout(() => { btn.textContent = originalLabel; btn.disabled = false; }, 1600);
-  };
-
-  window.saveNumber = async function(btn){
-    const wrapper = btn.closest('.thumb');
-    const input = wrapper.querySelector('.number-input');
-    const year = input.dataset.year;
-    const id = input.dataset.id;
-    const newNumber = input.value.trim();
-    const originalLabel = btn.textContent;
-    btn.disabled = true;
-    btn.textContent = '…';
-    try{
-      const snap = await db.ref(`photos/${year}/${id}`).once('value');
-      const { data, voting, caption } = normalizePhotoValue(snap.val());
-      await db.ref(`photos/${year}/${id}`).set({ data, voting, caption, number: newNumber });
-      btn.textContent = '✅';
-      setTimeout(() => loadExisting(), 500); // riordino la griglia in base al nuovo numero
-    }catch(e){
-      console.error('Errore salvataggio numero foto', e);
-      btn.textContent = '⚠️';
-      setTimeout(() => { btn.textContent = originalLabel; btn.disabled = false; }, 1600);
-    }
-  };
-
-  window.deletePhoto = async function(year, id){
-    if(!confirm('Eliminare questa foto? L\'azione è definitiva.')) return;
-    try{
-      await db.ref(`photos/${year}/${id}`).remove();
-    }catch(e){
-      console.error('Errore eliminazione foto', e);
-      alert('Errore durante l\'eliminazione della foto. Riprova.');
-      return;
-    }
-    try{
-      // rimuovo anche i voti associati a quella foto, così non restano orfani
-      await db.ref(`votes/${year}/${id}`).remove();
-    }catch(e){
-      // Anche se questo fallisce (es. regole non ancora aggiornate), la foto
-      // è comunque già stata eliminata: aggiorno la lista lo stesso.
-      console.error('Errore eliminazione voti collegati', e);
-    }
-    loadExisting();
-  };
 
   // ---------------- UPLOAD + COMPRESSIONE ----------------
   const dropZone = document.getElementById('drop-zone');

@@ -2,7 +2,7 @@
 
 Documento di riepilogo di tutto ciò che è stato costruito finora, per tenere traccia dello stato del sito, delle scelte fatte e di cosa resta da fare.
 
-**Ultimo aggiornamento:** 30 luglio 2026 (pulsanti delle schede foto che restano dentro il riquadro, anche su telefono)
+**Ultimo aggiornamento:** 30 luglio 2026 (admin: modifiche alle foto applicate tutte insieme con un pulsante)
 **Repository:** https://github.com/DOGFATCAT/Progetto-Gallo-d-oro
 **Sito online:** https://dogfatcat.github.io/Progetto-Gallo-d-oro/index.html
 
@@ -150,6 +150,7 @@ In parole semplici: chiunque può leggere foto/voti/anni attivi e votare o invia
 - Pannello **Anni presenti**: griglia di checkbox per scegliere quali anni sono realmente esistiti; il sito pubblico (pagina 2 e le frecce di pagina 3) mostra solo questi
 - Menu a tendina per scegliere l'anno da modificare, aggiornato automaticamente in base agli anni attivi selezionati
 - **Caricamento foto**: trascina o seleziona più immagini insieme; vengono compresse automaticamente (ridimensionate, qualità JPEG ridotta) prima di essere salvate, per restare leggere
+- **Modifiche in sospeso, applicate tutte insieme**: numero foto, didascalia, voto attivo/disattivo ed eliminazione non vengono più salvati subito. Le foto modificate si evidenziano in oro (quelle da eliminare in rosso e sbiadite) e in basso compare una barra con **"✅ Applica tutte le modifiche"** (una sola scrittura sul database) e **"↩︎ Annulla modifiche"**. Cambiando anno, uscendo o chiudendo la pagina con modifiche non applicate viene chiesta conferma
 - Per ogni foto già caricata: **numero foto assegnato automaticamente** (progressivo per anno) e modificabile a mano — utile per farlo corrispondere a come rinomini i file sul tuo computer; le foto in griglia si riordinano in base al numero; pulsante per **attivare/disattivare il voto**, campo per scrivere/salvare una **didascalia**, pulsante per **eliminarla** (rimuove anche i voti collegati)
 
 ### Filigrana, torna su, sicurezza e anteprima social
