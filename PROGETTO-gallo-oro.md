@@ -2,7 +2,7 @@
 
 Documento di riepilogo di tutto ciò che è stato costruito finora, per tenere traccia dello stato del sito, delle scelte fatte e di cosa resta da fare.
 
-**Ultimo aggiornamento:** 30 luglio 2026 (admin: modifiche alle foto applicate tutte insieme con un pulsante)
+**Ultimo aggiornamento:** 30 luglio 2026 (pagina foto: caricamento a blocchi da 30 foto)
 **Repository:** https://github.com/DOGFATCAT/Progetto-Gallo-d-oro
 **Sito online:** https://dogfatcat.github.io/Progetto-Gallo-d-oro/index.html
 
@@ -139,7 +139,7 @@ In parole semplici: chiunque può leggere foto/voti/anni attivi e votare o invia
 - **Anti-spam**: 4 secondi minimi tra un voto e l'altro (con avviso), più una validazione lato database (max 40 caratteri, non vuoto)
 - **Lightbox**: click su una foto reale per vederla ingrandita a schermo intero
 - **Frecce anno precedente/successivo**: navigano solo tra gli anni realmente attivi (non su anni senza foto)
-- **Caricamento a blocchi**: le foto si caricano 12 alla volta con un pulsante "Carica altre foto", pensato per reggere bene anche 100-150+ foto per anno senza rallentare l'apertura della pagina
+- **Caricamento a blocchi**: le foto si caricano 30 alla volta (costante `BATCH_SIZE` in `pagina3-foto.html`) con un pulsante "Carica altre foto", pensato per reggere bene anche 100-150+ foto per anno senza rallentare l'apertura della pagina
 - **Foto di gruppo**: l'admin può disattivare il gioco "chi è" su singole foto (utile per foto con tante persone insieme)
 - **Didascalia manuale**: quando il gioco è disattivato (o anche quando è attivo, come nota), l'admin può scrivere a mano chi si vede nella foto
 - **Carrello foto**: pulsante "Aggiungi al carrello" su ogni foto reale; un'iconcina fissa in basso a destra mostra quante foto sono state scelte; si apre un pannello con l'elenco (anche di anni diversi), si inseriscono nome/email/nota e si invia un'unica richiesta — salvata in admin **e** apre automaticamente il programma di posta del visitatore con un'email già pronta verso `fotogallodoro@gmail.com`, come doppia sicurezza
