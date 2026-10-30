@@ -18,6 +18,18 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+// ---------------- DISABILITA CARRELLO (opzionale) ----------------
+async function checkDisableCart(){
+  let disable = false;
+  try{
+    const snap = await db.ref('meta/siteGate/disableCart').once('value');
+    disable = !!snap.val(); // true/false, default false (carrello attivo)
+  }catch(e){
+    console.error('Errore lettura disableCart', e);
+  }
+  return disable;
+}
+
 // ---------------- IDENTITA' DEL VISITATORE ----------------
 // Serve solo per limitare "una persona, un voto per foto" — non è un login,
 // solo un id casuale salvato nel browser di chi visita il sito.
@@ -304,10 +316,23 @@ function normalizePhotoValue(val){
   return { data: null, voting: true, caption: '', number: '' };
 }
 
-function photoCardHtml(year, photoId, label, mediaHtml, hintCaption, votingEnabled, manualCaption){
+async function photoCardHtml(year, photoId, label, mediaHtml, hintCaption, votingEnabled, manualCaption){
   if(votingEnabled === undefined) votingEnabled = true; // retrocompatibilità
   manualCaption = (manualCaption || '').trim();
   const isRealPhoto = mediaHtml.includes('<img');
+  
+  // Controlla se il carrello è disabilitato (opzionale, da admin)
+  let disableCart = false;
+  try{
+    disableCart = await checkDisableCart();
+  }catch(e){
+    console.error('Errore controllo disableCart', e);
+  }
+  
+  // Se il carrello è disabilitato, nascondi tutti i pulsanti
+  const cartButtonHtml = (isRealPhoto && !disableCart)
+    ? `<button class="cart-btn" onclick="toggleCartItem(${year}, '${photoId}', this)">${isInCart(year, photoId) ? '✅ Nel carrello' : '🛒 Aggiungi al carrello'}</button>`
+    : '';
 
   // Se la scheda contiene una foto vera (non un segnaposto), la rendo
   // cliccabile per aprirla ingrandita nel lightbox.
@@ -315,10 +340,7 @@ function photoCardHtml(year, photoId, label, mediaHtml, hintCaption, votingEnabl
     ? `<div class="polaroid-img-wrap" onclick="openLightbox(this)">${mediaHtml}</div>`
     : mediaHtml;
 
-  // Pulsante carrello — solo sulle foto vere, non sui segnaposto demo
-  const cartButtonHtml = isRealPhoto
-    ? `<button class="cart-btn" onclick="toggleCartItem(${year}, '${photoId}', this)">${isInCart(year, photoId) ? '✅ Nel carrello' : '🛒 Aggiungi al carrello'}</button>`
-    : '';
+
 
   const staggerDelay = (Number(label) % 8) * 55;
 
@@ -601,8 +623,19 @@ function mountBackToTop(){
   }, { passive:true });
 }
 
-function mountCartWidget(){
+async function mountCartWidget(){
   if(document.getElementById('cart-fab')) return;
+
+  // Controlla se il carrello è disabilitato (opzionale, da admin)
+  let disableCart = false;
+  try{
+    disableCart = await checkDisableCart();
+  }catch(e){
+    console.error('Errore controllo mountCartWidget disableCart', e);
+  }
+  
+  // Se il carrello è disabilitato, non monta il widget flottante
+  if(disableCart) return;
 
   const fab = document.createElement('button');
   fab.id = 'cart-fab';

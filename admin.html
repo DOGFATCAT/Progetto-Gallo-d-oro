@@ -422,6 +422,15 @@
         <input type="password" id="gate-set-pass" class="caption-input" style="margin-top:4px;" placeholder="Scegli una password">
         <button class="save-caption-btn" style="margin-top:12px;" onclick="saveSiteGateCredentials()">💾 Salva utente e password</button>
         <p style="color:var(--gold-bright); font-size:0.8rem; min-height:1.2em; margin:8px 0 0;" id="gate-save-status"></p>
+
+        <div style="margin-top:16px;">
+          <h3 style="font-size:0.95rem; margin:0 0 8px;">🛒 Disabilita carrello</h3>
+          <p style="color:var(--cream-dim); font-size:0.85rem; margin:0 0 10px;">Quando attivo, tutti i pulsanti "Aggiungi al carrello" vengono nascosti e il widget flottante non appare più. Utile per periodi di manutenzione o per impedire ai visitatori di salvare richieste senza autorizzazione.</p>
+          <label class="watermark-toggle">
+            <input type="checkbox" id="disable-cart-checkbox">
+            🚫 Disabilita il carrello (tutti i pulsanti "Aggiungi al carrello" vengono nascosti)
+          </label>
+        </div>
       </div>
     </div>
 
@@ -726,6 +735,29 @@
     }catch(e){
       console.error('Errore salvataggio credenziali', e);
       statusEl.textContent = 'Errore, riprova.';
+    }
+  };
+
+  // ---------------- DISABILITA CARRELLO (opzionale) ----------------
+  async function loadDisableCartState(){
+    try{
+      const snap = await db.ref('meta/siteGate/disableCart').once('value');
+      const disabled = !!snap.val();
+      const chk = document.getElementById('disable-cart-checkbox');
+      if(chk) chk.checked = disabled;
+    }catch(e){
+      console.error('Errore lettura disableCart', e);
+    }
+  }
+
+  window.saveDisableCart = async function(){
+    const disabled = document.getElementById('disable-cart-checkbox').checked;
+    try{
+      await db.ref('meta/siteGate/disableCart').set(disabled);
+      alert(`${disabled ? '✅' : '🚫'} ${disabled ? 'Disabilita carrello' : 'Abilita carrello'} salvato!`);
+    }catch(e){
+      console.error('Errore salvataggio disableCart', e);
+      alert('Errore nel salvataggio, riprova.');
     }
   };
 

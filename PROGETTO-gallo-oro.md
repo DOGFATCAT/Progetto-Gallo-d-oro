@@ -107,6 +107,10 @@ requests/
       ".read": "auth != null && auth.token.email == 'fotogallodoro@gmail.com'",
       ".write": true
     },
+    "meta/siteGate/disableCart": {
+      ".read": true,
+      ".write": "auth != null && auth.token.email == 'fotogallodoro@gmail.com'"
+    },
     "$other": {
       ".read": false,
       ".write": false
@@ -115,7 +119,7 @@ requests/
 }
 ```
 
-In parole semplici: chiunque può leggere foto/voti/anni attivi e votare o inviare una richiesta, ma solo l'account con l'email `fotogallodoro@gmail.com` può caricare foto, gestire gli anni attivi, o leggere le richieste ricevute — anche se in futuro venisse creato per sbaglio un altro utente Firebase, non potrebbe scrivere nulla.
+In parole semplice: chiunque può leggere foto/voti/anni attivi e votare o inviare una richiesta, ma solo l'account con l'email `fotogallodoro@gmail.com` può caricare foto, gestire gli anni attivi, gestire la protezione sito (utente/password) o disabilitare il carrello — anche se in futuro venisse creato per sbaglio un altro utente Firebase, non potrebbe scrivere nulla.
 
 ---
 
